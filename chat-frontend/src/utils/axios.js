@@ -1,8 +1,7 @@
-// src/utils/axios.js
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:4000/api", // adjust this if your backend URL is different
+  baseURL: import.meta.env.VITE_API_URL + "/api", // uses your .env variable
 });
 
 // Automatically attach token
@@ -25,7 +24,7 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Handle token expiration (optional)
+// Handle token expiration
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -33,7 +32,6 @@ api.interceptors.response.use(
       error.response &&
       (error.response.status === 401 || error.response.status === 403)
     ) {
-      // Optional: logout user, redirect, show alert
       console.warn("⚠️ Token expired or unauthorized");
       localStorage.removeItem("chat-user");
       localStorage.removeItem("token");
