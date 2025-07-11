@@ -8,76 +8,58 @@ const fs = require("fs");
 const path = require("path");
 const connection = require("./db/db");
 const initSocket = require("./socketServer");
-const userRoute = require("./routes/userRoute");
+const userRoutes = require("./routes/userRoute");
 const avatarRoute = require("./routes/avatarRoute");
 const chatRoute = require("./routes/chatRoute");
 const messageRoute = require("./routes/messageRoute");
 const uploadRoute = require("./routes/uploadRoute");
 
-// ✅ Allowed Origins
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://chatverseapp.vercel.app", // ✅ use this
-];
-
-app.use(
-  cors({
-    origin: allowedOrigins,
-    credentials: true,
-  })
-);
-// ✅ Express App
+// ✅ Step 1: Create app & server
 const app = express();
 const server = http.createServer(app);
 
-// ✅ Socket.IO setup
+// ✅ Step 2: Set up Socket.IO
 const io = new Server(server, {
   cors: {
-    origin: allowedOrigins,
+    origin: process.env.CLIENT_ORIGIN || "*",
     credentials: true,
   },
 });
 
-// ✅ Make socket accessible via request (optional)
+// ✅ Step 3: Attach io to requests
 app.use((req, res, next) => {
   req.io = io;
   next();
 });
 
-// ✅ Middleware
+// ✅ Step 4: Middleware
 app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
+    origin: process.env.CLIENT_ORIGIN || "*",
     credentials: true,
   })
 );
 
-// ✅ Static Files
+// ✅ Step 5: Serve static files
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// ✅ Routes
-app.use("/api/user", userRoute);
+// ✅ Step 6: Routes
+app.use("/api/user", userRoutes);
 app.use("/api/avatar", avatarRoute);
 app.use("/api/chat", chatRoute);
 app.use("/api/message", messageRoute);
 app.use("/api/upload", uploadRoute);
 
-// ✅ DB Connection
+// ✅ Step 7: Connect DB
 connection();
 
-// ✅ Start Server
+// ✅ Step 8: Start server
 const PORT = process.env.PORT || 4000;
 server.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log("🚀 Server running on port", PORT);
 });
 
-// ✅ Init Socket.IO
+// ✅ Step 9: Init socket
 initSocket(io);
