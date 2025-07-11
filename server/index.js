@@ -8,63 +8,70 @@ const fs = require("fs");
 const path = require("path");
 const connection = require("./db/db");
 const initSocket = require("./socketServer");
-const userRoutes = require("./routes/userRoute");
 const userRoute = require("./routes/userRoute");
 const avatarRoute = require("./routes/avatarRoute");
 const chatRoute = require("./routes/chatRoute");
 const messageRoute = require("./routes/messageRoute");
 const uploadRoute = require("./routes/uploadRoute");
 
-// Log route files
-console.log("Routes folder contains:", fs.readdirSync("./routes"));
+// ✅ Allowed Origins
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://chatverse-nz2n5yxy8-sagardhondges-projects.vercel.app",
+];
 
-// Initialize app and server
+// ✅ Express App
 const app = express();
 const server = http.createServer(app);
 
-// Setup Socket.IO
+// ✅ Socket.IO setup
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: allowedOrigins,
     credentials: true,
   },
 });
 
-// Attach io to every request (optional if needed in routes)
+// ✅ Make socket accessible via request (optional)
 app.use((req, res, next) => {
   req.io = io;
   next();
 });
 
-// Middlewares
+// ✅ Middleware
 app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
 
-// Serve uploaded files
+// ✅ Static Files
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-// API Routes
+
+// ✅ Routes
 app.use("/api/user", userRoute);
 app.use("/api/avatar", avatarRoute);
 app.use("/api/chat", chatRoute);
 app.use("/api/message", messageRoute);
-app.use("/api/upload", uploadRoute); // ✅ new file/image route
-app.use("/api/user", userRoutes);
-app.use(express.json());
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/api/upload", uploadRoute);
 
-// DB Connection
+// ✅ DB Connection
 connection();
 
-// Start listening and init sockets
-server.listen(process.env.PORT || 4000, () => {
-  console.log("🚀 Server running on port", process.env.PORT || 4000);
+// ✅ Start Server
+const PORT = process.env.PORT || 4000;
+server.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
 });
 
-// Start Socket.IO logic
-initSocket(io); // 🔌 handles events like join-chat, new-message, etc.
+// ✅ Init Socket.IO
+initSocket(io);
