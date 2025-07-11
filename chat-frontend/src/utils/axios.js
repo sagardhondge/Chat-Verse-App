@@ -40,5 +40,7 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+console.log("🌐 API Base URL:", import.meta.env.VITE_API_URL);
+
 
 export default api;
