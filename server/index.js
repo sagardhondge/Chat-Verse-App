@@ -17,9 +17,15 @@ const uploadRoute = require("./routes/uploadRoute");
 // ✅ Allowed Origins
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://chatverse-nz2n5yxy8-sagardhondges-projects.vercel.app",
+  "https://chatverseapp.vercel.app", // ✅ use this
 ];
 
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+  })
+);
 // ✅ Express App
 const app = express();
 const server = http.createServer(app);
