@@ -1,10 +1,11 @@
+// src/utils/axios.js
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL + "/api", // uses your .env variable
+  baseURL: `${import.meta.env.VITE_API_URL}/api`, // ✅ Use environment variable
 });
 
-// Automatically attach token
+// Automatically attach token to each request
 api.interceptors.request.use(
   (config) => {
     const storedUser = localStorage.getItem("chat-user");
@@ -24,7 +25,7 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Handle token expiration
+// Handle token expiration globally
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -35,7 +36,7 @@ api.interceptors.response.use(
       console.warn("⚠️ Token expired or unauthorized");
       localStorage.removeItem("chat-user");
       localStorage.removeItem("token");
-      window.location.href = "/login";
+      window.location.href = "/login"; // Redirect to login page
     }
     return Promise.reject(error);
   }
