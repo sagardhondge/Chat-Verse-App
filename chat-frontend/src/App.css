@@ -1,0 +1,786 @@
+/* src/App.css - Comprehensive Styles for ChatVerse App */
+
+/* Define CSS Variables for Easy Theming */
+:root {
+    /* Main Backgrounds */
+    --dark-bg-main: #282a36;        /* Deeper dark background for chat area, LoginPage, RegisterPage */
+    --sidebar-bg: #3c3e4b;          /* Slightly lighter dark for sidebar */
+    --messages-area-bg-dark: #2f313e; /* Dark background for message display area in dark mode */
+    --messages-area-bg-light: #f8f9fa; /* Light background for message display area in light mode */
+
+    /* Text Colors */
+    --text-color-light: #f8f8f2;    /* Light text for general content in dark mode */
+    --text-color-dark: #213547;     /* Dark text for general content in light mode */
+    --muted-text-color: #abb2bf;    /* Muted text for subtle details in dark mode */
+    --muted-text-color-light: #666; /* Muted text for subtle details in light mode */
+
+    /* Accent & Action Colors (from your screenshots) */
+    --primary-blue: #0d6efd;        /* Blue for buttons, outgoing messages */
+    --secondary-gray: #6c757d;      /* Grey for incoming messages, secondary buttons */
+    --accent-purple: #bd93f9;       /* Original target image accent, can be used for highlights */
+    --success-green: #28a745;       /* Green for success states */
+    --danger-red: #dc3545;          /* Red for danger/delete actions */
+
+    /* Borders & Shadows */
+    --border-color: #44475a;        /* Subtle border color for separators */
+    --shadow-color: rgba(0, 0, 0, 0.3); /* For general shadows */
+    --highlight-shadow: rgba(189, 147, 249, 0.25); /* Accent glow on focus */
+
+    /* Component Specific */
+    --hover-bg: #5a5c6b;            /* Background on hover for list items */
+    --online-color: #50fa7b;        /* Green for online status */
+    --offline-color: #ff5555;       /* Red for offline status */
+    --button-dark-mode-bg: #555c68; /* Specific dark grey for "Light Mode" button in dark theme */
+}
+
+
+/* --- Global Styles --- */
+body {
+    margin: 0;
+    font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+    min-width: 320px;
+    min-height: 100vh;
+    display: flex; /* Ensures the app container fills the height */
+    overflow: hidden; /* Prevent body scroll, layout components handle scrolling */
+}
+
+/* Theme Context driven body background and text color */
+body.bg-dark {
+    background-color: var(--dark-bg-main) !important;
+    color: var(--text-color-light) !important;
+}
+
+body.bg-light {
+    background-color: var(--messages-area-bg-light) !important; /* Lighter background for light mode */
+    color: var(--text-color-dark) !important;
+}
+
+/* --- Main App Container & Layout --- */
+/* This ensures the entire application takes up full viewport height and width */
+.chat-app-container {
+    height: 100vh;
+    width: 100vw;
+    display: flex; /* Makes main layout children flexible */
+}
+
+/* Base styles for all Bootstrap Forms and Buttons */
+.form-control, .form-select {
+    background-color: var(--sidebar-bg); /* Default dark input background */
+    border: 1px solid var(--border-color);
+    color: var(--text-color-light);
+    border-radius: 8px; /* Slightly rounded */
+    transition: all 0.2s ease;
+}
+.form-control::placeholder, .form-select::placeholder {
+    color: var(--muted-text-color) !important; /* Important to override browser defaults */
+    opacity: 0.7; /* Make placeholder a bit faded */
+}
+.form-control:focus, .form-select:focus {
+    background-color: var(--sidebar-bg);
+    color: var(--text-color-light);
+    border-color: var(--accent-purple); /* Consistent accent color on focus */
+    box-shadow: 0 0 0 0.25rem var(--highlight-shadow);
+}
+
+/* Light mode specific adjustments for form controls */
+body.bg-light .form-control,
+body.bg-light .form-select {
+    background-color: #f1f1f1;
+    border-color: #ccc;
+    color: var(--text-color-dark);
+}
+body.bg-light .form-control::placeholder,
+body.bg-light .form-select::placeholder {
+    color: #888 !important;
+}
+body.bg-light .form-control:focus,
+body.bg-light .form-select:focus {
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+
+/* All buttons common styles */
+.btn {
+    border-radius: 8px; /* Match form control rounding */
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+/* Primary buttons (Login, Register, Send Message) */
+.btn-primary {
+    background-color: var(--primary-blue) !important;
+    border-color: var(--primary-blue) !important;
+    color: var(--text-color-light) !important;
+}
+.btn-primary:hover {
+    background-color: #0b5ed7 !important;
+    border-color: #0a58ca !important;
+}
+
+/* Secondary buttons (Search in chat, Cancel modals) */
+.btn-secondary {
+    background-color: var(--secondary-gray) !important;
+    border-color: var(--secondary-gray) !important;
+    color: var(--text-color-light) !important;
+}
+.btn-secondary:hover {
+    background-color: #5c636a !important;
+    border-color: #565e64 !important;
+}
+
+/* Success buttons (Register, Save Changes) */
+.btn-success {
+    background-color: var(--success-green) !important;
+    border-color: var(--success-green) !important;
+    color: var(--text-color-light) !important;
+}
+.btn-success:hover {
+    background-color: #218838 !important;
+    border-color: #1e7e34 !important;
+}
+
+/* Danger buttons (Delete, Logout) */
+.btn-danger {
+    background-color: var(--danger-red) !important;
+    border-color: var(--danger-red) !important;
+    color: var(--text-color-light) !important;
+}
+.btn-danger:hover {
+    background-color: #c82333 !important;
+    border-color: #bd2130 !important;
+}
+
+/* Outline buttons (Light Mode, Account in Sidebar) */
+.btn-outline-secondary, .btn-outline-primary, .btn-outline-danger {
+    background-color: transparent !important; /* Ensure transparent background */
+    border-width: 1px;
+}
+body.bg-dark .btn-outline-secondary { /* Light Mode button in dark theme */
+    border-color: var(--button-dark-mode-bg) !important;
+    background-color: var(--button-dark-mode-bg) !important; /* Solid background as per screenshot */
+    color: var(--text-color-light) !important;
+}
+body.bg-dark .btn-outline-secondary:hover {
+    background-color: #6a7380 !important;
+    border-color: #6a7380 !important;
+}
+body.bg-light .btn-outline-secondary { /* Light Mode button in light theme */
+    border-color: var(--secondary-gray) !important;
+    color: var(--secondary-gray) !important;
+}
+body.bg-light .btn-outline-secondary:hover {
+    background-color: var(--secondary-gray) !important;
+    color: var(--text-color-light) !important;
+}
+
+body.bg-dark .btn-outline-primary { /* Account button in dark theme */
+    border-color: var(--primary-blue) !important;
+    color: var(--primary-blue) !important;
+}
+body.bg-dark .btn-outline-primary:hover {
+    background-color: var(--primary-blue) !important;
+    color: var(--text-color-light) !important;
+}
+
+body.bg-dark .btn-outline-danger { /* Logout button in dark theme */
+    border-color: var(--danger-red) !important;
+    color: var(--danger-red) !important;
+}
+body.bg-dark .btn-outline-danger:hover {
+    background-color: var(--danger-red) !important;
+    color: var(--text-color-light) !important;
+}
+
+
+/* --- Auth Pages (Login, Register) --- */
+/* Base container for Login/Register forms */
+#root > div[style*="height: 100vh"][style*="justify-content: center"] {
+    background-color: var(--dark-bg-main) !important; /* Ensures the full page is dark */
+}
+
+/* Card styles for Login/Register forms */
+.card {
+    border: none; /* Remove default Bootstrap card border */
+    border-radius: 1rem !important; /* Rounded-4 matches 1rem */
+    box-shadow: 0 4px 15px var(--shadow-color);
+    animation: fadeIn 0.5s ease;
+}
+
+body.bg-dark .card {
+    background-color: var(--sidebar-bg) !important; /* Darker card background */
+    color: var(--text-color-light) !important;
+}
+
+body.bg-light .card {
+    background-color: #fff !important;
+    color: var(--text-color-dark) !important;
+}
+
+/* Toggle Theme Button in Auth Forms */
+.card .btn-link {
+    color: var(--text-color-light) !important; /* Default to light text color for icons */
+    font-size: 1.5rem !important; /* Large icon size */
+    padding: 0 !important; /* Remove padding */
+    transition: transform 0.2s ease;
+}
+.card .btn-link:hover {
+    color: var(--accent-purple) !important;
+    transform: scale(1.1);
+}
+body.bg-light .card .btn-link {
+    color: var(--text-color-dark) !important;
+}
+
+/* --- Sidebar (src/components/Sidebar.jsx) --- */
+.sidebar-left {
+    background-color: var(--sidebar-bg);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 300px; /* Fixed width as per your inline style */
+    font-family: "Segoe UI, sans-serif"; /* Fixed font */
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+    overflow-y: auto; /* Allow sidebar to scroll */
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-color) transparent;
+}
+.sidebar-left::-webkit-scrollbar {
+    width: 8px;
+}
+.sidebar-left::-webkit-scrollbar-track {
+    background: transparent;
+}
+.sidebar-left::-webkit-scrollbar-thumb {
+    background-color: var(--border-color);
+    border-radius: 4px;
+    border: 2px solid var(--sidebar-bg);
+}
+
+/* Sidebar Profile Header */
+.sidebar-profile-header { /* New class for the profile div */
+    padding: 15px;
+    border-bottom: 1px solid var(--border-color);
+    cursor: pointer;
+}
+.sidebar-profile-header img {
+    border: 2px solid var(--accent-purple); /* Adjust if you prefer no border or a different color */
+    object-fit: cover;
+}
+.sidebar-profile-header strong {
+    color: var(--text-color-light);
+}
+
+/* Chats Header */
+.sidebar-chats-header { /* New class for the chats header div */
+    padding: 10px 15px;
+    border-bottom: 1px solid var(--border-color);
+    cursor: pointer;
+    user-select: none;
+}
+.sidebar-chats-header span {
+    font-weight: 600 !important; /* fw-semibold in JSX */
+    color: var(--text-color-light);
+}
+.sidebar-chats-header .btn-link {
+    color: var(--muted-text-color) !important; /* FaUsers icon */
+    font-size: 1.2em;
+    padding: 0;
+}
+.sidebar-chats-header .btn-link:hover {
+    color: var(--accent-purple) !important;
+}
+.sidebar-chats-header .fa-chevron-up, .sidebar-chats-header .fa-chevron-down {
+    color: var(--muted-text-color);
+    font-size: 0.8em;
+}
+
+/* Chat List (ListGroup) */
+.list-group-chat-scroll { /* Specific class for your chat list */
+    max-height: 60vh; /* Controlled by inline style, but defining here for clarity */
+    overflow-y: auto;
+    flex-grow: 1; /* Ensures it takes available space */
+}
+
+/* Individual Chat Item in Sidebar */
+.list-group-chat-scroll .list-group-item {
+    padding: 12px 15px !important; /* Consistent padding */
+    border-bottom: 1px solid var(--border-color) !important;
+    font-size: 1rem !important;
+    transition: background-color 0.2s ease;
+}
+
+body.bg-dark .list-group-chat-scroll .list-group-item {
+    background-color: var(--sidebar-bg) !important;
+    color: var(--text-color-light) !important;
+}
+body.bg-light .list-group-chat-scroll .list-group-item {
+    background-color: #fff !important;
+    color: var(--text-color-dark) !important;
+}
+
+
+.list-group-chat-scroll .list-group-item.active {
+    background-color: var(--hover-bg) !important;
+    font-weight: bold !important;
+    color: var(--text-color-light) !important;
+}
+
+.list-group-chat-scroll .list-group-item:hover:not(.active) {
+    background-color: var(--hover-bg) !important;
+}
+
+.list-group-chat-scroll .chat-item-avatar { /* Avatar in chat list item */
+    border: 1px solid var(--border-color) !important; /* Grey border for chat avatars */
+    object-fit: cover;
+}
+
+.list-group-chat-scroll .online-status-dot { /* Online/Offline dot */
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid var(--sidebar-bg); /* Border color matches sidebar background */
+}
+.online-status-dot.online { background-color: var(--online-color); }
+.online-status-dot.offline { background-color: var(--offline-color); }
+
+/* Sidebar Bottom Buttons */
+.sidebar-bottom-buttons { /* New class for the div containing bottom buttons */
+    padding: 15px;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* gap-2 from JSX */
+    margin-top: auto; /* Pushes to bottom */
+}
+
+
+/* --- Chat Layout (src/components/chat/ChatLayout.jsx) --- */
+.chat-main-area-container { /* This will be the main flex-grow-1 d-flex flex-column div */
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--dark-bg-main); /* Default to dark background */
+}
+body.bg-light .chat-main-area-container {
+    background-color: var(--messages-area-bg-light); /* Light mode background */
+}
+
+
+/* Chat Header for Active Chat */
+.chat-active-header { /* This will be the p-3 border-bottom d-flex justify-content-between align-items-center div */
+    padding: 15px !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    flex-shrink: 0; /* Prevent header from shrinking */
+}
+body.bg-dark .chat-active-header {
+    background-color: var(--dark-bg-main) !important;
+    color: var(--text-color-light) !important;
+}
+body.bg-light .chat-active-header {
+    background-color: #fff !important;
+    color: var(--text-color-dark) !important;
+}
+
+.chat-active-header h5 {
+    font-weight: 600;
+    margin-bottom: 0;
+}
+
+/* Chat Header Action Buttons (⚙️, ❌) */
+.chat-active-header .btn-outline-secondary, .chat-active-header .btn-outline-danger {
+    background-color: transparent !important;
+    border: none !important; /* Remove border */
+    font-size: 1.2em; /* Icon size */
+    padding: 0.25rem 0.5rem; /* Smaller padding */
+    transition: color 0.2s ease;
+}
+.chat-active-header .btn-outline-secondary { color: var(--muted-text-color) !important; }
+.chat-active-header .btn-outline-danger { color: var(--danger-red) !important; }
+
+.chat-active-header .btn-outline-secondary:hover, .chat-active-header .btn-outline-danger:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important; /* Subtle hover effect */
+}
+
+/* Chat Search Form */
+.chat-search-form { /* New class for the chat search Form */
+    padding: 10px 15px !important; /* Adjust padding */
+    border-bottom: 1px solid var(--border-color) !important;
+    flex-shrink: 0;
+}
+body.bg-dark .chat-search-form { background-color: var(--dark-bg-main) !important; }
+body.bg-light .chat-search-form { background-color: #fff !important; }
+
+.chat-search-form .form-control {
+    border-right: none; /* Make it look integrated with button */
+}
+.chat-search-form .input-group > .btn { /* Search button in chat search */
+    background-color: var(--sidebar-bg) !important; /* Match sidebar background for search btn */
+    border-color: var(--border-color) !important;
+    color: var(--text-color-light) !important;
+}
+.chat-search-form .input-group > .btn:hover {
+    background-color: var(--hover-bg) !important;
+}
+
+/* Chat Search Results List */
+.chat-search-results-list { /* New class for the search results div */
+    padding: 10px 15px !important;
+    border-bottom: 1px solid var(--border-color) !important;
+}
+body.bg-dark .chat-search-results-list { background-color: var(--dark-bg-main) !important; }
+body.bg-light .chat-search-results-list { background-color: #fff !important; }
+
+.chat-search-results-list .list-group-item {
+    background-color: var(--sidebar-bg) !important; /* Matches sidebar items */
+    border-color: var(--border-color) !important;
+    color: var(--text-color-light) !important;
+    margin-bottom: 5px; /* Spacing between results */
+    border-radius: 8px; /* Rounded corners */
+    transition: background-color 0.2s ease;
+}
+.chat-search-results-list .list-group-item:hover {
+    background-color: var(--hover-bg) !important;
+}
+body.bg-light .chat-search-results-list .list-group-item {
+    background-color: #f1f1f1 !important;
+    color: var(--text-color-dark) !important;
+}
+
+/* Main Messages Display Area */
+.chat-messages-display { /* This will be the flex-grow-1 px-3 py-2 overflow-auto div */
+    flex-grow: 1;
+    padding: 15px !important;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-color) transparent;
+}
+.chat-messages-display::-webkit-scrollbar {
+    width: 8px;
+}
+.chat-messages-display::-webkit-scrollbar-track {
+    background: transparent;
+}
+.chat-messages-display::-webkit-scrollbar-thumb {
+    background-color: var(--border-color);
+    border-radius: 4px;
+    border: 2px solid var(--dark-bg-main);
+}
+body.bg-dark .chat-messages-display {
+    background-color: var(--messages-area-bg-dark) !important; /* Specific messages background */
+    color: var(--text-color-light) !important;
+}
+body.bg-light .chat-messages-display {
+    background-color: var(--messages-area-bg-light) !important;
+    color: var(--text-color-dark) !important;
+}
+
+/* Welcome Message Placeholder */
+.chat-messages-display > .text-center.mt-5 {
+    color: var(--muted-text-color); /* Matches your screenshot */
+}
+
+/* --- Message Bubble (src/components/chat/MessageBubble.jsx) --- */
+/* Base Bubble styles (from your MessageBubble.css, now integrated) */
+.message-bubble {
+    padding: 10px 14px;
+    border-radius: 16px;
+    max-width: 75%;
+    word-wrap: break-word;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    /* Remove inline styles here and rely on classes below */
+}
+
+/* Incoming Message Bubble */
+.message-bubble.receiver-dark { /* Used for receiver in dark mode */
+    background-color: var(--incoming-msg-bg) !important; /* Grey from your screenshot */
+    color: var(--text-color-light) !important;
+    border-bottom-left-radius: 4px !important; /* Pointed corner */
+}
+.message-bubble.receiver-light { /* Used for receiver in light mode */
+    background-color: #f1f1f1 !important;
+    color: var(--text-color-dark) !important;
+    border-bottom-left-radius: 4px !important;
+}
+
+/* Outgoing Message Bubble */
+.message-bubble.sender { /* Used for sender in both modes */
+    background-color: var(--primary-blue) !important; /* Blue from your screenshot */
+    color: #fff !important;
+    border-bottom-right-radius: 4px !important; /* Pointed corner */
+}
+
+/* Sender Name inside bubble (for incoming messages) */
+.message-bubble .sender-name {
+    font-weight: 500;
+    margin-bottom: 4px;
+    font-size: 0.85rem !important;
+    color: var(--text-color-light) !important; /* White in dark mode */
+}
+body.bg-light .message-bubble.receiver-light .sender-name {
+    color: var(--text-color-dark) !important; /* Black in light mode */
+}
+
+/* Message Content */
+.message-content {
+    white-space: pre-wrap; /* Preserves whitespace and line breaks */
+    color: inherit; /* Inherit color from parent bubble */
+}
+
+/* File preview/link within message bubble */
+.message-bubble .message-file a {
+    color: var(--text-color-light) !important; /* White link in dark bubbles */
+}
+body.bg-light .message-bubble.receiver-light .message-file a {
+    color: var(--primary-blue) !important; /* Blue link in light bubbles */
+}
+.message-bubble .message-file div { /* File name and size */
+    font-size: 0.75rem !important;
+    margin-top: 2px !important;
+    color: rgba(255, 255, 255, 0.8) !important; /* Slightly muted white */
+}
+body.bg-light .message-bubble.receiver-light .message-file div {
+    color: #555 !important;
+}
+
+
+/* Message Timestamp */
+.message-bubble .message-time {
+    text-align: right;
+    font-size: 0.75rem !important;
+    margin-top: 4px !important;
+    color: rgba(255, 255, 255, 0.7) !important; /* Muted white in dark bubbles */
+}
+body.bg-light .message-bubble.receiver-light .message-time {
+    color: #666 !important;
+}
+
+
+/* --- Message Input (src/components/chat/MessageInput.jsx) --- */
+.message-input-area-container { /* This will be the p-3 border-top div from ChatLayout */
+    padding: 15px !important;
+    border-top: 1px solid var(--border-color) !important;
+    flex-shrink: 0;
+}
+body.bg-dark .message-input-area-container {
+    background-color: var(--dark-bg-main) !important;
+}
+body.bg-light .message-input-area-container {
+    background-color: #fff !important;
+}
+
+
+.message-input-group { /* This is the d-flex align-items-center position-relative gap-2 w-100 px-2 py-2 div */
+    display: flex;
+    align-items: center;
+    position: relative;
+    gap: 8px; /* gap-2 in Bootstrap is 0.5rem = 8px */
+    width: 100%;
+    padding: 0 !important; /* Remove internal padding, handled by parent */
+    /* Remove the inline bg-white, handle with dark/light mode classes */
+}
+
+/* Emoji and File Buttons */
+.message-input-group .btn-light {
+    background-color: var(--secondary-gray) !important; /* Matching incoming message bubble color */
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-color-light) !important;
+    border-radius: 8px;
+    padding: 8px; /* Adjust padding for square buttons */
+    line-height: 1; /* Center icon vertically */
+}
+.message-input-group .btn-light:hover {
+    background-color: #79808a !important;
+    border-color: #79808a !important;
+}
+body.bg-light .message-input-group .btn-light {
+    background-color: #e9ecef !important; /* Light grey for light mode */
+    border-color: #ccc !important;
+    color: var(--text-color-dark) !important;
+}
+body.bg-light .message-input-group .btn-light:hover {
+    background-color: #dee2e6 !important;
+    border-color: #bbb !important;
+}
+
+/* Textarea Input */
+.message-input-group textarea.form-control {
+    background-color: var(--secondary-gray) !important; /* Matching incoming message bubble color */
+    border-color: var(--border-color) !important;
+    color: var(--text-color-light) !important;
+    resize: none !important; /* Keep resize none */
+    border-radius: 8px;
+}
+body.bg-light .message-input-group textarea.form-control {
+    background-color: #e9ecef !important;
+    border-color: #ccc !important;
+    color: var(--text-color-dark) !important;
+}
+
+/* Send Button */
+.message-input-group .btn-primary {
+    background-color: var(--primary-blue) !important;
+    border-color: var(--primary-blue) !important;
+    color: var(--text-color-light) !important;
+    border-radius: 8px;
+    padding: 8px 15px; /* Adjust padding to match surrounding elements */
+    font-size: 1em; /* Normal font size */
+    display: flex; /* For icon alignment */
+    align-items: center;
+    justify-content: center;
+}
+
+/* Emoji Picker positioning */
+.emoji-picker-container { /* New class for the emoji picker div */
+    position: absolute;
+    bottom: 100%; /* Position above the input area */
+    left: 0;
+    margin-bottom: 10px; /* mb-2 from JSX is 0.5rem = 8px */
+    z-index: 1050; /* zindex-tooltip from JSX */
+    box-shadow: 0 4px 12px var(--shadow-color);
+    border-radius: 8px;
+    overflow: hidden; /* Ensure picker content stays within bounds */
+}
+.emoji-picker-close-btn {
+    background-color: var(--sidebar-bg) !important;
+    border: none !important;
+    color: var(--muted-text-color) !important;
+    padding: 5px;
+    border-bottom-left-radius: 0; /* No radius on top corners */
+    border-bottom-right-radius: 0;
+    font-size: 1.2em;
+}
+body.bg-light .emoji-picker-close-btn {
+    background-color: #eee !important;
+    color: #666 !important;
+}
+
+/* --- Modals (GroupInfoModal, UserInfoModal) --- */
+/* Styles extracted from UserInfoModal.jsx inline style tag */
+.blurred-backdrop {
+    backdrop-filter: blur(8px);
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+    font-family: 'Segoe UI', sans-serif;
+    border-radius: 12px;
+    transition: all 0.3s ease-in-out;
+}
+
+.modal-title {
+    font-weight: 600;
+}
+
+.modal .shadow { /* For Image in UserInfoModal */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3) !important;
+}
+
+body.bg-dark .modal-content {
+    background-color: var(--sidebar-bg) !important; /* Dark mode modal background */
+    color: var(--text-color-light) !important;
+}
+
+body.bg-dark .modal-header,
+body.bg-dark .modal-footer {
+    background-color: var(--sidebar-bg) !important; /* Dark mode header/footer */
+    border-color: var(--border-color) !important;
+}
+
+/* Account Page */
+.account-page-card { /* Custom class for the Card in AccountPage */
+    max-width: 600px;
+    margin: 0 auto;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px var(--shadow-color);
+}
+body.bg-dark .account-page-card {
+    background-color: var(--sidebar-bg) !important; /* Match dark theme for card */
+    color: var(--text-color-light) !important;
+}
+body.bg-light .account-page-card {
+    background-color: #fff !important;
+    color: var(--text-color-dark) !important;
+}
+/* Ensure form controls within AccountPage are styled correctly */
+.account-page-card .form-control,
+.account-page-card .form-select {
+    background-color: var(--dark-bg-main); /* Slightly darker for fields within card */
+    border-color: var(--border-color);
+}
+body.bg-light .account-page-card .form-control,
+body.bg-light .account-page-card .form-select {
+    background-color: #f1f1f1;
+    border-color: #ccc;
+}
+
+
+/* --- Animations (from index.css and inline styles) --- */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+/* Ensure no duplicate fadeIn or other conflicting animations */
+
+/* --- General Utilities & Overrides --- */
+/* Placeholder color fix (moved from index.css) */
+input::placeholder, textarea::placeholder {
+  color: var(--muted-text-color) !important;
+}
+body.bg-light input::placeholder, body.bg-light textarea::placeholder {
+    color: #888 !important;
+}
+
+/* Ensure links in dark mode are visible */
+body.bg-dark a {
+    color: var(--accent-purple);
+}
+body.bg-dark a:hover {
+    color: #ceb3f6;
+}
+
+.angular-top {
+  position: relative;
+  clip-path: polygon(0 0, 100% 10px, 100% 100%, 0% 100%);
+  background-color: inherit;
+  z-index: 1;
+}
+.angular-bottom {
+  position: relative;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), 0% 100%);
+  background-color: inherit;
+  z-index: 1;
+} 
+
+@keyframes glow {
+  0% {
+    box-shadow: 0 0 2px rgba(128, 128, 128, 0.3); /* light gray */
+  }
+  50% {
+    box-shadow: 0 0 6px rgba(128, 128, 128, 0.7); /* medium gray */
+  }
+  100% {
+    box-shadow: 0 0 2px rgba(128, 128, 128, 0.3);
+  }
+}
+@keyframes glowBorder {
+  0% {
+    box-shadow: 0 0 4px rgba(200, 200, 200, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 10px rgba(200, 200, 200, 0.8);
+  }
+  100% {
+    box-shadow: 0 0 4px rgba(200, 200, 200, 0.4);
+  }
+}
