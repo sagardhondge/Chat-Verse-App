@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Form, Button } from "react-bootstrap";
-import axios from "axios";
+import api from "../../utils/axios"; // ✅ changed from axios to api
 import { useAuth } from "../../context/AuthContext";
 import { useTheme } from "../../context/ThemeContext";
 
@@ -16,13 +16,10 @@ export default function LoginForm() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const { data } = await axios.post(
-        "https://chatverse-backend-0c8u.onrender.com/api/user/login",
-        {
-          email,
-          password,
-        }
-      );
+      const { data } = await api.post("/user/login", {
+        email,
+        password,
+      });
 
       const fullUser = { ...data.user, token: data.token };
       setUser(fullUser);
@@ -32,7 +29,6 @@ export default function LoginForm() {
       alert(err.response?.data?.message || "Login failed");
     }
   };
-
   return (
     <div
       style={{

@@ -8,7 +8,10 @@
       {
         "ignore": [
           "backdrop-filter",
-          "user-select"
+          "user-select",
+          "scrollbar-color",
+          "scrollbar-width",
+          "scrollbar-width: thin"
         ]
       }
     ]
