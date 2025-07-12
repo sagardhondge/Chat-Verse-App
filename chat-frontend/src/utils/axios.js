@@ -1,22 +1,19 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: `${import.meta.env.VITE_API_URL}/api`, // ✅ Use environment variable
+  baseURL: `${import.meta.env.VITE_API_URL}/api`, // ✅ dynamic from .env
 });
 
-// Automatically attach token to each request
+// Attach token if available
 api.interceptors.request.use(
   (config) => {
-    const storedUser = localStorage.getItem("chat-user");
     const token = localStorage.getItem("token");
+    const user = JSON.parse(localStorage.getItem("chat-user") || "{}");
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-    } else if (storedUser) {
-      const parsed = JSON.parse(storedUser);
-      if (parsed?.token) {
-        config.headers.Authorization = `Bearer ${parsed.token}`;
-      }
+    } else if (user?.token) {
+      config.headers.Authorization = `Bearer ${user.token}`;
     }
 
     return config;
@@ -24,23 +21,17 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Handle token expiration globally
+// Handle auth error globally
 api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (
-      error.response &&
-      (error.response.status === 401 || error.response.status === 403)
-    ) {
-      console.warn("⚠️ Token expired or unauthorized");
-      localStorage.removeItem("chat-user");
+  (res) => res,
+  (err) => {
+    if (err.response?.status === 401 || err.response?.status === 403) {
       localStorage.removeItem("token");
-      window.location.href = "/login"; // Redirect to login page
+      localStorage.removeItem("chat-user");
+      window.location.href = "/login";
     }
-    return Promise.reject(error);
+    return Promise.reject(err);
   }
 );
-console.log("🌐 API Base URL:", import.meta.env.VITE_API_URL);
-
 
 export default api;
