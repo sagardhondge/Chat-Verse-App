@@ -17,7 +17,7 @@ export default function ProfilePage() {
       try {
         const endpoint = isOwnProfile ? "/me" : `/${id}`;
         const { data } = await axios.get(
-          `http://localhost:4000/api/user${endpoint}`,
+          `https://chatverse-backend-0c8u.onrender.com/api/user${endpoint}`,
           {
             headers: {
               Authorization: `Bearer ${user.token}`,

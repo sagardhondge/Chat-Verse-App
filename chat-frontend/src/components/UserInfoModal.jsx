@@ -2,7 +2,6 @@ import { Modal, Button, Form, Image } from "react-bootstrap";
 import { useState } from "react";
 import api from "../utils/axios";
 import { useAuth } from "../context/AuthContext";
-import UserInfoModal from "./UserInfoModal";
 
 export default function UserInfoModal({ show, onHide, user }) {
   const { setUser } = useAuth();
@@ -36,8 +35,8 @@ export default function UserInfoModal({ show, onHide, user }) {
       };
 
       // 1. Update profile info
-      const { data } = await axios.put(
-        "http://localhost:4000/api/user/profile",
+      const { data } = await api.put(
+        "/user/profile",
         formData,
         config
       );
@@ -46,8 +45,8 @@ export default function UserInfoModal({ show, onHide, user }) {
       if (avatarFile) {
         const formDataAvatar = new FormData();
         formDataAvatar.append("avatar", avatarFile);
-        const avatarRes = await axios.post(
-          "http://localhost:4000/api/user/avatar",
+        const avatarRes = await api.post(
+          "/user/avatar",
           formDataAvatar,
           config
         );
@@ -77,7 +76,7 @@ export default function UserInfoModal({ show, onHide, user }) {
       <Modal.Body className="text-center">
         <div>
           <Image
-            src={`http://localhost:4000${user.avatar || "/default-avatar.png"}`}
+            src={`https://chatverse-backend-0c8u.onrender.com${user.avatar || "/default-avatar.png"}`}
             roundedCircle
             width={100}
             height={100}
@@ -149,7 +148,6 @@ export default function UserInfoModal({ show, onHide, user }) {
         </Button>
       </Modal.Footer>
 
-      {/* 👇 Embedded styles for animation, blur and font */}
       <style>{`
         .blurred-backdrop {
           backdrop-filter: blur(8px);

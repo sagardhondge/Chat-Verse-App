@@ -18,7 +18,7 @@ export default function LoginPage() {
         height: "100vh",
         width: "100vw",
         display: "flex",
-        justifyContent: "center", // ✅ fixed from "flex-center" to "center"
+        justifyContent: "center",
         alignItems: "center",
         backgroundImage: `url(${loginBg})`,
         backgroundSize: "cover",

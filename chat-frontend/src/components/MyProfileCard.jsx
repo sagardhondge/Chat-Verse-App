@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { Modal, Button, Form, Image, Spinner, ListGroup } from "react-bootstrap";
 import { useAuth } from "../../context/AuthContext";
-import api from "../utils/axios";
+import axios from "axios";
+
 export default function GroupInfoModal({ show, onHide, group, updateGroup }) {
   const { user } = useAuth();
   const [groupName, setGroupName] = useState("");
@@ -23,11 +24,11 @@ export default function GroupInfoModal({ show, onHide, group, updateGroup }) {
     setRenaming(true);
     try {
       const { data } = await axios.put(
-        "http://localhost:4000/api/chat/rename",
+        "https://chatverse-backend-0c8u.onrender.com/api/chat/rename",
         { chatId: group._id, chatName: groupName },
         { headers: { Authorization: `Bearer ${user.token}` } }
       );
-      updateGroup(data); // optional callback to refresh group info
+      updateGroup(data);
       onHide();
     } catch (err) {
       console.error("Rename failed", err);

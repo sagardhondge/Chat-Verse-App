@@ -124,48 +124,43 @@ export default function Sidebar({
   }, [selectedChat]);
 
   return (
-  <>
-    <div style={{ display: "flex" }}>
-      {/* Glowing Left Border */}
-      <div
-  className="glow-border"
-  style={{
-    width: "4px",
-    backgroundColor: "gray", // ← Change to gray
-    height: "100vh",
-    borderRadius: "0 4px 4px 0",
-  }}
-/>
+    <>
+      <div style={{ display: "flex" }}>
+        <div
+          className="glow-border"
+          style={{
+            width: "4px",
+            backgroundColor: "gray",
+            height: "100vh",
+            borderRadius: "0 4px 4px 0",
+          }}
+        />
 
-
-      {/* Sidebar Main */}
-      <div
-        className={`d-flex flex-column justify-content-between ${darkMode ? "bg-dark text-white" : "bg-white"} border-start`}
-        style={{
-          width: "300px",
-          height: "100vh",
-          fontFamily: "Segoe UI, sans-serif",
-          borderLeft: "1px solid #dee2e6",
-          borderRight: "1px solid #dee2e6",
-          boxShadow: darkMode
-            ? "0 0 10px rgba(0,0,0,0.2)"
-            : "0 0 10px rgba(0,0,0,0.05)",
-          overflowY: "auto",
-          borderTop: "1px solid #dee2e6",
-          borderBottom: "1px solid #dee2e6",
-          transition: "all 0.3s ease",
-        }}
-      >
-
+        <div
+          className={`d-flex flex-column justify-content-between ${darkMode ? "bg-dark text-white" : "bg-white"} border-start`}
+          style={{
+            width: "300px",
+            height: "100vh",
+            fontFamily: "Segoe UI, sans-serif",
+            borderLeft: "1px solid #dee2e6",
+            borderRight: "1px solid #dee2e6",
+            boxShadow: darkMode
+              ? "0 0 10px rgba(0,0,0,0.2)"
+              : "0 0 10px rgba(0,0,0,0.05)",
+            overflowY: "auto",
+            borderTop: "1px solid #dee2e6",
+            borderBottom: "1px solid #dee2e6",
+            transition: "all 0.3s ease",
+          }}
+        >
           <div>
-            {/* Profile */}
             <div
               className="d-flex align-items-center gap-2 p-3 border-bottom"
               style={{ cursor: "pointer" }}
               onClick={() => setShowProfile(true)}
             >
               <Image
-                src={`http://localhost:4000${user?.avatar || "/default-avatar.png"}`}
+                src={`https://chatverse-backend-0c8u.onrender.com${user?.avatar || "/default-avatar.png"}`}
                 roundedCircle
                 width={40}
                 height={40}
@@ -176,7 +171,6 @@ export default function Sidebar({
               </strong>
             </div>
 
-            {/* Chats header + Create Group */}
             <div className="d-flex justify-content-between align-items-center px-3 py-2 border-bottom">
               <div
                 onClick={() => setIsChatListOpen((prev) => !prev)}
@@ -191,7 +185,6 @@ export default function Sidebar({
               </Button>
             </div>
 
-            {/* Chat List */}
             {isChatListOpen && (
               <ListGroup
                 variant="flush"
@@ -238,7 +231,7 @@ export default function Sidebar({
                             {!chat.isGroupChat && otherUser && (
                               <div style={{ position: "relative" }}>
                                 <Image
-                                  src={`http://localhost:4000${
+                                  src={`https://chatverse-backend-0c8u.onrender.com${
                                     otherUser?.avatar || "/default-avatar.png"
                                   }`}
                                   roundedCircle
@@ -276,7 +269,6 @@ export default function Sidebar({
             )}
           </div>
 
-          {/* Bottom Section */}
           <div className="p-3 border-top d-flex flex-column gap-2">
             <Button
               variant="outline-secondary"
@@ -306,14 +298,13 @@ export default function Sidebar({
         </div>
       </div>
 
-      {/* Profile Modal */}
       <Modal show={showProfile} onHide={() => setShowProfile(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>Your Profile</Modal.Title>
         </Modal.Header>
         <Modal.Body className="text-center">
           <Image
-            src={`http://localhost:4000${user?.avatar || "/default-avatar.png"}`}
+            src={`https://chatverse-backend-0c8u.onrender.com${user?.avatar || "/default-avatar.png"}`}
             roundedCircle
             width={200}
             height={200}
@@ -325,7 +316,6 @@ export default function Sidebar({
         </Modal.Body>
       </Modal>
 
-      {/* Create Group Modal */}
       <Modal show={showGroupModal} onHide={() => setShowGroupModal(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>Create Group Chat</Modal.Title>

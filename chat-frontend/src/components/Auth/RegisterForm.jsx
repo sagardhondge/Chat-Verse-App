@@ -1,4 +1,4 @@
-// src/components/Auth/RegisterForm.jsx
+
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
@@ -18,12 +18,15 @@ export default function RegisterForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const { data } = await axios.post("http://localhost:4000/api/user/register", {
-        firstName,
-        lastName,
-        email,
-        password,
-      });
+      const { data } = await axios.post(
+        "https://chatverse-backend-0c8u.onrender.com/api/user/register",
+        {
+          firstName,
+          lastName,
+          email,
+          password,
+        }
+      );
 
       const fullUser = { ...data.user, token: data.token };
       setUser(fullUser);

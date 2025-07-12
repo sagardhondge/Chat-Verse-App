@@ -1,14 +1,17 @@
+// ChatLayout.jsx
 import { useEffect, useState, useRef } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useTheme } from "../../context/ThemeContext";
 import { Button, Spinner, Form, InputGroup, ListGroup } from "react-bootstrap";
-import api from "../../utils/axios";
+import axios from "axios";
 import { useSocket } from "../../context/SocketContext";
 import MessageBubble from "./MessageBubble";
 import MessageInput from "./MessageInput";
 import Sidebar from "../Sidebar";
 import GroupInfoModal from "../modals/GroupInfoModal";
 import { useNavigate } from "react-router-dom";
+
+const BASE_URL = "https://chatverse-backend-0c8u.onrender.com";
 
 export default function ChatLayout() {
   const { user, logout } = useAuth();
@@ -31,7 +34,9 @@ export default function ChatLayout() {
 
   const fetchChats = async () => {
     try {
-      const { data } = await api.get("/chat");
+      const { data } = await axios.get(`${BASE_URL}/chat`, {
+        headers: { Authorization: `Bearer ${user?.token}` },
+      });
       const sortedChats = data.sort((a, b) => {
         const aTime = new Date(a.latestMessage?.createdAt || 0).getTime();
         const bTime = new Date(b.latestMessage?.createdAt || 0).getTime();
@@ -63,7 +68,9 @@ export default function ChatLayout() {
     const fetchMessages = async () => {
       if (!selectedChat || !selectedChat._id) return;
       try {
-        const { data } = await api.get(`/message/${selectedChat._id}`);
+        const { data } = await axios.get(`${BASE_URL}/message/${selectedChat._id}`, {
+          headers: { Authorization: `Bearer ${user?.token}` },
+        });
         setMessages(data);
         socket?.emit("join-chat", selectedChat._id);
       } catch (error) {
@@ -77,50 +84,49 @@ export default function ChatLayout() {
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
-useEffect(() => {
-  if (!socket) return;
 
-  const handleMessageReceived = (message) => {
-    const chatId = typeof message.chat === "string" ? message.chat : message.chat?._id;
-    if (!chatId) return;
+  useEffect(() => {
+    if (!socket) return;
 
-    // Push message if user is in chat
-    if (selectedChat && chatId === selectedChat._id) {
-      setMessages((prev) => [...prev, message]);
-    } else {
-      // Increment unread count
+    const handleMessageReceived = (message) => {
+      const chatId = typeof message.chat === "string" ? message.chat : message.chat?._id;
+      if (!chatId) return;
+
+      if (selectedChat && chatId === selectedChat._id) {
+        setMessages((prev) => [...prev, message]);
+      } else {
+        setUnreadCounts((prev) => ({
+          ...prev,
+          [chatId]: (prev[chatId] || 0) + 1,
+        }));
+      }
+
+      setChats((prevChats) => {
+        const chatIndex = prevChats.findIndex((c) => c._id === chatId);
+        if (chatIndex === -1) return prevChats;
+        const updatedChat = { ...prevChats[chatIndex], latestMessage: message };
+        const newChats = [...prevChats];
+        newChats.splice(chatIndex, 1);
+        return [updatedChat, ...newChats];
+      });
+    };
+
+    const handleChatHasUnread = ({ chatId }) => {
+      if (selectedChat && selectedChat._id === chatId) return;
       setUnreadCounts((prev) => ({
         ...prev,
         [chatId]: (prev[chatId] || 0) + 1,
       }));
-    }
+    };
 
-    setChats((prevChats) => {
-      const chatIndex = prevChats.findIndex((c) => c._id === chatId);
-      if (chatIndex === -1) return prevChats;
-      const updatedChat = { ...prevChats[chatIndex], latestMessage: message };
-      const newChats = [...prevChats];
-      newChats.splice(chatIndex, 1);
-      return [updatedChat, ...newChats];
-    });
-  };
+    socket.on("messageReceived", handleMessageReceived);
+    socket.on("chatHasUnread", handleChatHasUnread);
 
-  const handleChatHasUnread = ({ chatId }) => {
-    if (selectedChat && selectedChat._id === chatId) return;
-    setUnreadCounts((prev) => ({
-      ...prev,
-      [chatId]: (prev[chatId] || 0) + 1,
-    }));
-  };
-
-  socket.on("messageReceived", handleMessageReceived);
-  socket.on("chatHasUnread", handleChatHasUnread);
-
-  return () => {
-    socket.off("messageReceived", handleMessageReceived);
-    socket.off("chatHasUnread", handleChatHasUnread);
-  };
-}, [socket, selectedChat]);
+    return () => {
+      socket.off("messageReceived", handleMessageReceived);
+      socket.off("chatHasUnread", handleChatHasUnread);
+    };
+  }, [socket, selectedChat]);
 
   const getChatDisplayName = (chat) => {
     if (!chat.isGroupChat) {
@@ -135,10 +141,14 @@ useEffect(() => {
   const handleSendMessage = async () => {
     if (!newMessage.trim() || !selectedChat?._id) return;
     try {
-      const { data } = await api.post("/message", {
-        content: newMessage,
-        chatId: selectedChat._id,
-      });
+      const { data } = await axios.post(
+        `${BASE_URL}/message`,
+        {
+          content: newMessage,
+          chatId: selectedChat._id,
+        },
+        { headers: { Authorization: `Bearer ${user?.token}` } }
+      );
       setMessages((prev) => [...prev, data]);
       setNewMessage("");
       setChats((prevChats) => {
@@ -163,8 +173,11 @@ useEffect(() => {
       formData.append("file", file);
       formData.append("chatId", selectedChat._id);
 
-      const { data } = await api.post("/message/upload", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+      const { data } = await axios.post(`${BASE_URL}/message/upload`, formData, {
+        headers: {
+          Authorization: `Bearer ${user?.token}`,
+          "Content-Type": "multipart/form-data",
+        },
       });
 
       setMessages((prev) => [...prev, data]);
@@ -188,7 +201,9 @@ useEffect(() => {
     if (!search.trim()) return;
     setSearchLoading(true);
     try {
-      const { data } = await api.get(`/user?search=${search}`);
+      const { data } = await axios.get(`${BASE_URL}/user?search=${search}`, {
+        headers: { Authorization: `Bearer ${user?.token}` },
+      });
       setSearchResults(data);
     } catch (err) {
       console.error("Search error", err);
@@ -200,7 +215,11 @@ useEffect(() => {
 
   const startNewChat = async (userId) => {
     try {
-      const { data } = await api.post("/chat", { userId });
+      const { data } = await axios.post(
+        `${BASE_URL}/chat`,
+        { userId },
+        { headers: { Authorization: `Bearer ${user?.token}` } }
+      );
       setSelectedChat(data);
       setSearch("");
       setSearchResults([]);
@@ -210,7 +229,6 @@ useEffect(() => {
       alert("Failed to start chat");
     }
   };
-
   return (
     <>
     

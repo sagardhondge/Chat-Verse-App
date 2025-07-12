@@ -20,7 +20,8 @@ export default function MessageBubble({ message }) {
     file?.endsWith(".gif") ||
     file?.endsWith(".webp");
 
-  // Extract file name and size if available
+  const BASE_URL = "https://chatverse-backend-0c8u.onrender.com";
+
   const getFileName = (path) => path?.split("/").pop();
   const getReadableSize = (bytes) => {
     if (!bytes) return "";
@@ -35,7 +36,6 @@ export default function MessageBubble({ message }) {
 
   return (
     <div className={`d-flex ${isSender ? "justify-content-end" : "justify-content-start"} mb-3`}>
-      
       <div
         className={`message-bubble ${isSender ? "sender" : darkMode ? "receiver-dark" : "receiver-light"}`}
         style={{
@@ -59,18 +59,17 @@ export default function MessageBubble({ message }) {
 
         <div className="message-content">{message.content}</div>
 
-        {/* File preview */}
         {message.file && (
           <div className="message-file mt-2">
             {isImage(message.file) ? (
               <img
-                src={`http://localhost:4000${message.file}`}
+                src={`${BASE_URL}${message.file}`}
                 alt="Sent File"
                 style={{ maxWidth: "200px", borderRadius: "8px", marginBottom: "5px" }}
               />
             ) : (
               <a
-                href={`http://localhost:4000${message.file}`}
+                href={`${BASE_URL}${message.file}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{
@@ -82,8 +81,6 @@ export default function MessageBubble({ message }) {
                 📎 View File
               </a>
             )}
-
-            {/* File name and (optional) size */}
             <div
               style={{
                 fontSize: "0.75rem",
@@ -97,7 +94,6 @@ export default function MessageBubble({ message }) {
           </div>
         )}
 
-        {/* Timestamp */}
         <div
           className="message-time"
           style={{

@@ -13,7 +13,6 @@ export default function MessageInput({ newMessage, setNewMessage, onSend, onFile
 
   const handleEmojiSelect = (emoji) => {
     setNewMessage((prev) => prev + emoji.native);
-    // 👇 Do not close emoji picker after selecting
   };
 
   const handleFileChange = (e) => {
@@ -28,7 +27,6 @@ export default function MessageInput({ newMessage, setNewMessage, onSend, onFile
     }
   };
 
-  // Close emoji picker on outside click
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -46,7 +44,6 @@ export default function MessageInput({ newMessage, setNewMessage, onSend, onFile
 
   return (
     <div className="d-flex align-items-center position-relative gap-2 w-100 px-2 py-2 border-top bg-white">
-      {/* Emoji Toggle */}
       <Button
         variant="light"
         onClick={() => setShowEmojiPicker((prev) => !prev)}
@@ -56,7 +53,6 @@ export default function MessageInput({ newMessage, setNewMessage, onSend, onFile
         <BsEmojiSmile size={20} />
       </Button>
 
-      {/* File Picker */}
       <Button
         variant="light"
         onClick={() => fileInputRef.current.click()}
@@ -73,7 +69,6 @@ export default function MessageInput({ newMessage, setNewMessage, onSend, onFile
         style={{ display: "none" }}
       />
 
-      {/* Text Input */}
       <textarea
         className="form-control flex-grow-1"
         rows={1}
@@ -84,13 +79,10 @@ export default function MessageInput({ newMessage, setNewMessage, onSend, onFile
         style={{ resize: "none" }}
       />
 
-      <Button onClick={() => {
-        onSend();
-      }} disabled={!newMessage.trim()}>
+      <Button onClick={() => onSend()} disabled={!newMessage.trim()}>
         Send
       </Button>
 
-      {/* Emoji Picker */}
       {showEmojiPicker && (
         <div
           ref={emojiPickerRef}

@@ -28,7 +28,7 @@ export const SocketProvider = ({ children }) => {
       socketRef.current.disconnect();
     }
 
-    const newSocket = io("http://localhost:4000", {
+    const newSocket = io(import.meta.env.VITE_API_URL, {
       auth: { token: user.token },
       withCredentials: true,
       transports: ["websocket"], // recommended for performance

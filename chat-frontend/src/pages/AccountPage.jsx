@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
-import { Button, Card, Col, Form, Image, Modal, Row, Spinner } from "react-bootstrap";
+import { Button, Card, Form, Image, Modal, Spinner } from "react-bootstrap";
 import axios from "axios";
 
 export default function AccountPage() {
@@ -34,7 +34,7 @@ export default function AccountPage() {
         gender: user.gender || "",
         dateOfBirth: user.dateOfBirth?.substring(0, 10) || "",
         email: user.email || "",
-        password: "", // leave empty by default
+        password: "",
       });
       setLoading(false);
     }
@@ -71,7 +71,11 @@ export default function AccountPage() {
         },
       };
 
-      const { data } = await axios.put("http://localhost:4000/api/user/profile", form, config);
+      const { data } = await axios.put(
+        "https://chatverse-backend-0c8u.onrender.com/api/user/profile",
+        form,
+        config
+      );
 
       const fullUser = {
         ...user,
@@ -103,13 +107,16 @@ export default function AccountPage() {
       };
 
       const { data } = await axios.post(
-        "http://localhost:4000/api/user/verify-password",
+        "https://chatverse-backend-0c8u.onrender.com/api/user/verify-password",
         { password: deletePassword },
         config
       );
 
       if (data.valid) {
-        await axios.delete("http://localhost:4000/api/user/delete", config);
+        await axios.delete(
+          "https://chatverse-backend-0c8u.onrender.com/api/user/delete",
+          config
+        );
         setUser(null);
         localStorage.removeItem("chat-user");
         alert("✅ Account deleted");
@@ -126,17 +133,32 @@ export default function AccountPage() {
     }
   };
 
-  if (loading) return <div className="text-center mt-5"><Spinner /></div>;
+  if (loading)
+    return (
+      <div className="text-center mt-5">
+        <Spinner />
+      </div>
+    );
 
   return (
-<div className={`p-4 vh-100 overflow-auto ${darkMode ? "bg-dark text-white" : "bg-light text-dark"}`} style={{ display: "flex", justifyContent: "center", alignItems: "flex-start" }}>
-      <Card className={`shadow p-4 ${darkMode ? "bg-secondary text-white" : ""}`} style={{ width: "100%", maxWidth: "500px" }}>
+    <div
+      className={`p-4 vh-100 overflow-auto ${
+        darkMode ? "bg-dark text-white" : "bg-light text-dark"
+      }`}
+      style={{ display: "flex", justifyContent: "center", alignItems: "flex-start" }}
+    >
+      <Card
+        className={`shadow p-4 ${darkMode ? "bg-secondary text-white" : ""}`}
+        style={{ width: "100%", maxWidth: "500px" }}
+      >
         <Card.Body>
           <h4 className="mb-4 text-center">Account Details</h4>
 
           <div className="text-center mb-3">
             <Image
-              src={`http://localhost:4000${user.avatar || "/default-avatar.png"}`}
+              src={`https://chatverse-backend-0c8u.onrender.com${
+                user.avatar || "/default-avatar.png"
+              }`}
               roundedCircle
               width={90}
               height={90}
@@ -152,7 +174,12 @@ export default function AccountPage() {
           <Form onSubmit={handleSubmit}>
             <Form.Group className="mb-3">
               <Form.Label>First Name</Form.Label>
-              <Form.Control name="firstName" value={formData.firstName} onChange={handleChange} required />
+              <Form.Control
+                name="firstName"
+                value={formData.firstName}
+                onChange={handleChange}
+                required
+              />
             </Form.Group>
 
             <Form.Group className="mb-3">
@@ -205,7 +232,13 @@ export default function AccountPage() {
 
             <Form.Group className="mb-3">
               <Form.Label>About</Form.Label>
-              <Form.Control name="about" value={formData.about} onChange={handleChange} as="textarea" rows={3} />
+              <Form.Control
+                name="about"
+                value={formData.about}
+                onChange={handleChange}
+                as="textarea"
+                rows={3}
+              />
             </Form.Group>
 
             <Button type="submit" variant="primary" disabled={saving} className="w-100">

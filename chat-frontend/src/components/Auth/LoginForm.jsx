@@ -16,10 +16,13 @@ export default function LoginForm() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const { data } = await axios.post("http://localhost:4000/api/user/login", {
-        email,
-        password,
-      });
+      const { data } = await axios.post(
+        "https://chatverse-backend-0c8u.onrender.com/api/user/login",
+        {
+          email,
+          password,
+        }
+      );
 
       const fullUser = { ...data.user, token: data.token };
       setUser(fullUser);
@@ -47,20 +50,6 @@ export default function LoginForm() {
         color: darkMode ? "#fff" : "#000",
       }}
     >
-      {/* <div className="d-flex justify-content-between align-items-center mb-4">
-        <h4 className="fw-bold mb-0">
-          ChatVerse App <span>✉</span>
-        </h4>
-        <Button
-          variant="link"
-          onClick={toggleTheme}
-          className="text-decoration-none fs-4"
-          title="Toggle theme"
-        >
-          {darkMode ? "🌞" : "🌙"}
-        </Button>
-      </div> */}
-
       <Form onSubmit={handleLogin}>
         <Form.Group className="mb-3">
           <Form.Label>Email address</Form.Label>
