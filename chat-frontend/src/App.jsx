@@ -7,13 +7,13 @@ import AccountPage from "./pages/AccountPage";
 import { useEffect } from "react";
 import { useTheme } from "./context/ThemeContext";
 
-// PrivateRoute wrapper
+// ✅ PrivateRoute wrapper for authenticated routes
 function PrivateRoute({ children }) {
   const { user } = useAuth();
   return user ? children : <Navigate to="/login" replace />;
 }
 
-// PublicRoute wrapper
+// ✅ PublicRoute wrapper to block login/register for logged-in users
 function PublicRoute({ children }) {
   const { user } = useAuth();
   return !user ? children : <Navigate to="/chat" replace />;
