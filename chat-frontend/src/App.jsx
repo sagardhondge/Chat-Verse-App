@@ -8,18 +8,19 @@ import AccountPage from "./pages/AccountPage";
 import { useEffect } from "react";
 import { useTheme } from "./context/ThemeContext";
 
-// a PrivateRoute wrapper
+// ✅ Private route
 function PrivateRoute({ children }) {
   const { user } = useAuth();
   return user ? children : <Navigate to="/login" replace />;
 }
 
-// A PublicRoute wrapper (to prevent access to login/register when logged in)
+// ✅ Public route
 function PublicRoute({ children }) {
   const { user } = useAuth();
   return !user ? children : <Navigate to="/chat" replace />;
 }
 
+// ✅ AppRoutes should be inside AuthProvider
 function AppRoutes() {
   return (
     <Routes>
@@ -59,6 +60,7 @@ function AppRoutes() {
     </Routes>
   );
 }
+
 function App() {
   const { theme } = useTheme();
 
@@ -78,13 +80,13 @@ function App() {
         minHeight: "100vh",
       }}
     >
-      <AuthProvider>
-        <SocketProvider>
-          <BrowserRouter>
+      <BrowserRouter>
+        <AuthProvider>
+          <SocketProvider>
             <AppRoutes />
-          </BrowserRouter>
-        </SocketProvider>
-      </AuthProvider>
+          </SocketProvider>
+        </AuthProvider>
+      </BrowserRouter>
     </div>
   );
 }
