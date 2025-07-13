@@ -8,13 +8,13 @@ import AccountPage from "./pages/AccountPage";
 import { useEffect } from "react";
 import { useTheme } from "./context/ThemeContext";
 
-// ✅ Create a PrivateRoute wrapper
+// a PrivateRoute wrapper
 function PrivateRoute({ children }) {
   const { user } = useAuth();
   return user ? children : <Navigate to="/login" replace />;
 }
 
-// ✅ Create a PublicRoute wrapper (to prevent access to login/register when logged in)
+// A PublicRoute wrapper (to prevent access to login/register when logged in)
 function PublicRoute({ children }) {
   const { user } = useAuth();
   return !user ? children : <Navigate to="/chat" replace />;
@@ -23,7 +23,7 @@ function PublicRoute({ children }) {
 function AppRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/chat" replace />} />
+      <Route path="/" element={<Navigate to="/login" replace />} />
       <Route
         path="/login"
         element={
@@ -59,7 +59,6 @@ function AppRoutes() {
     </Routes>
   );
 }
-
 function App() {
   const { theme } = useTheme();
 
