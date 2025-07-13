@@ -4,10 +4,11 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const http = require("http");
 const { Server } = require("socket.io");
-const fs = require("fs");
 const path = require("path");
+
 const connection = require("./db/db");
 const initSocket = require("./socketServer");
+
 const userRoutes = require("./routes/userRoute");
 const avatarRoute = require("./routes/avatarRoute");
 const chatRoute = require("./routes/chatRoute");
@@ -18,10 +19,10 @@ const uploadRoute = require("./routes/uploadRoute");
 const app = express();
 const server = http.createServer(app);
 
-// ✅ Step 2: Set up Socket.IO
+// ✅ Step 2: Set up Socket.IO with CORS
 const io = new Server(server, {
   cors: {
-    origin: process.env.CLIENT_ORIGIN || "*",
+    origin: process.env.CLIENT_ORIGIN || "https://chatverseapp.vercel.app",
     credentials: true,
   },
 });
@@ -33,16 +34,27 @@ app.use((req, res, next) => {
 });
 
 // ✅ Step 4: Middleware
-app.use(express.json());
-app.use(cookieParser());
+const allowedOrigins = [
+  "https://chatverseapp.vercel.app", // ✅ Your deployed frontend
+];
+
 app.use(
   cors({
-    origin: process.env.CLIENT_ORIGIN || "*",
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
 
-// ✅ Step 5: Serve static files
+app.use(express.json());
+app.use(cookieParser());
+
+// ✅ Step 5: Serve static files (uploads)
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // ✅ Step 6: Routes
@@ -52,14 +64,14 @@ app.use("/api/chat", chatRoute);
 app.use("/api/message", messageRoute);
 app.use("/api/upload", uploadRoute);
 
-// ✅ Step 7: Connect DB
+// ✅ Step 7: Connect to DB
 connection();
 
 // ✅ Step 8: Start server
 const PORT = process.env.PORT || 4000;
 server.listen(PORT, () => {
-  console.log("🚀 Server running on port", PORT);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
 
-// ✅ Step 9: Init socket
+// ✅ Step 9: Initialize Socket.IO
 initSocket(io);
