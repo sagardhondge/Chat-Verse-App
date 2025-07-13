@@ -14,21 +14,21 @@ export default function LoginForm() {
   const [password, setPassword] = useState("");
 
   const handleLogin = async (e) => {
-    e.preventDefault();
-    try {
-      const { data } = await api.post("/user/login", {
-        email,
-        password,
-      });
+  e.preventDefault();
+  try {
+    const { data } = await api.post("/user/login", {
+      email,
+      password,
+    });
 
-      const fullUser = { ...data.user, token: data.token };
-      setUser(fullUser);
-      localStorage.setItem("chat-user", JSON.stringify(fullUser));
-      navigate("/");
-    } catch (err) {
-      alert(err.response?.data?.message || "Login failed");
-    }
-  };
+    const fullUser = { ...data.user, token: data.token };
+    setUser(fullUser);
+    localStorage.setItem("chat-user", JSON.stringify(fullUser));
+    navigate("/");
+  } catch (err) {
+    alert(err.response?.data?.message || "Login failed");
+  }
+};
   return (
     <div
       style={{

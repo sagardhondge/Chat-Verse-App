@@ -1,10 +1,9 @@
-
 import { useState } from "react";
-import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { Form, Button, Card } from "react-bootstrap";
 import { useTheme } from "../../context/ThemeContext";
 import { useAuth } from "../../context/AuthContext";
+import api from "../../utils/axios"; // ✅ Use custom axios instance
 
 export default function RegisterForm() {
   const [firstName, setFirstName] = useState("");
@@ -18,15 +17,12 @@ export default function RegisterForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const { data } = await axios.post(
-        "https://chatverse-backend-0c8u.onrender.com/api/user/register",
-        {
-          firstName,
-          lastName,
-          email,
-          password,
-        }
-      );
+      const { data } = await api.post("/user/register", {
+        firstName,
+        lastName,
+        email,
+        password,
+      });
 
       const fullUser = { ...data.user, token: data.token };
       setUser(fullUser);
