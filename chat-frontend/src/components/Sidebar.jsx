@@ -13,8 +13,11 @@ import {
   InputGroup,
   Spinner,
 } from "react-bootstrap";
-import { FaChevronDown, FaChevronUp, FaMoon, FaSun, FaUsers } from "react-icons/fa";
+import { FaChevronDown, FaChevronUp, FaUsers } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import ThemePicker from "./ThemePicker";
+
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 export default function Sidebar({
   chats,
@@ -24,7 +27,7 @@ export default function Sidebar({
   loading,
 }) {
   const { user, logout, onlineUsers = [] } = useAuth();
-  const { darkMode, toggleTheme } = useTheme();
+  const { themeName } = useTheme();
   const socket = useSocket();
   const navigate = useNavigate();
 
@@ -125,7 +128,7 @@ export default function Sidebar({
 
   return (
     <>
-      <div style={{ display: "flex" }}>
+      <div style={{ display: "flex" }} key={themeName}>
         <div
           className="glow-border"
           style={{
@@ -137,22 +140,20 @@ export default function Sidebar({
         />
 
         <div
-          className={`d-flex flex-column justify-content-between ${darkMode ? "bg-dark text-white" : "bg-white"} border-start`}
+          className="d-flex flex-column justify-content-between"
           style={{
             width: "300px",
             height: "100vh",
             fontFamily: "Segoe UI, sans-serif",
-            borderLeft: "1px solid #dee2e6",
-            borderRight: "1px solid #dee2e6",
-            boxShadow: darkMode
-              ? "0 0 10px rgba(0,0,0,0.2)"
-              : "0 0 10px rgba(0,0,0,0.05)",
+            backgroundColor: "var(--background)",
+            color: "var(--text)",
+            borderLeft: "2px solid var(--secondary)",
+            borderRight: "2px solid var(--secondary)",
             overflowY: "auto",
-            borderTop: "1px solid #dee2e6",
-            borderBottom: "1px solid #dee2e6",
             transition: "all 0.3s ease",
           }}
         >
+          {/* Top Section */}
           <div>
             <div
               className="d-flex align-items-center gap-2 p-3 border-bottom"
@@ -160,13 +161,16 @@ export default function Sidebar({
               onClick={() => setShowProfile(true)}
             >
               <Image
-                src={`https://chatverse-backend-0c8u.onrender.com${user?.avatar || "/default-avatar.png"}`}
+                src={`${BASE_URL}${user?.avatar || "/default-avatar.png"}`}
                 roundedCircle
                 width={40}
                 height={40}
                 style={{ border: "2px solid #ccc" }}
               />
-              <strong className="text-truncate">
+              <strong
+                className="text-truncate"
+                style={{ color: "var(--text)" }}
+              >
                 {user?.firstName} {user?.lastName}
               </strong>
             </div>
@@ -177,7 +181,7 @@ export default function Sidebar({
                 className="d-flex align-items-center"
                 style={{ cursor: "pointer" }}
               >
-                <span className="fw-semibold me-2">Chats</span>
+                <span className="fw-semibold me-2" style={{ color: "var(--text)" }}>Chats</span>
                 {isChatListOpen ? <FaChevronUp /> : <FaChevronDown />}
               </div>
               <Button variant="link" onClick={openGroupModal} title="Create Group Chat">
@@ -189,103 +193,97 @@ export default function Sidebar({
               <ListGroup
                 variant="flush"
                 className="chat-scroll"
-                style={{ overflowY: "auto", maxHeight: "60vh" }}
+                style={{
+                  overflowY: "auto",
+                  maxHeight: "70vh",
+                  fontFamily: "Segoe UI, sans-serif",
+                  backgroundColor: "var(--background)",
+                }}
               >
                 {loading ? (
                   <ListGroup.Item className="text-center">Loading chats...</ListGroup.Item>
                 ) : !Array.isArray(chats) || chats.length === 0 ? (
                   <ListGroup.Item>No chats yet</ListGroup.Item>
                 ) : (
-                  chats
-                    .filter((chat) => {
-                      if (chat.isGroupChat) return true;
-                      const otherUser = Array.isArray(chat.users)
-                        ? chat.users.find((u) => u && u._id !== user._id)
-                        : null;
-                      return otherUser;
-                    })
-                    .map((chat) => {
-                      const otherUser = Array.isArray(chat.users)
-                        ? chat.users.find((u) => u && u._id !== user._id)
-                        : null;
-                      const online = isUserOnline(chat);
+                  chats.map((chat) => {
+                    const otherUser = chat.users.find((u) => u && u._id !== user._id);
+                    const online = isUserOnline(chat);
 
-                      return (
-                        <ListGroup.Item
-                          key={chat._id}
-                          action
-                          active={selectedChat?._id === chat._id}
-                          onClick={() => setSelectedChat(chat)}
-                          className={`d-flex justify-content-between align-items-center ${
-                            darkMode ? "bg-dark text-white" : "bg-white text-dark"
-                          }`}
-                          style={{
-                            borderBottom: "1px solid #ddd",
-                            fontWeight:
-                              selectedChat?._id === chat._id ? "bold" : "normal",
-                            fontSize: "1rem",
-                            padding: "0.75rem 1rem",
-                          }}
-                        >
-                          <div className="d-flex align-items-center gap-2">
-                            {!chat.isGroupChat && otherUser && (
-                              <div style={{ position: "relative" }}>
-                                <Image
-                                  src={`https://chatverse-backend-0c8u.onrender.com${
-                                    otherUser?.avatar || "/default-avatar.png"
-                                  }`}
-                                  roundedCircle
-                                  width={45}
-                                  height={45}
-                                  style={{
-                                    objectFit: "cover",
-                                    border: "1px solid #ccc",
-                                  }}
-                                />
-                                <span
-                                  style={{
-                                    position: "absolute",
-                                    bottom: 0,
-                                    right: 0,
-                                    width: "10px",
-                                    height: "10px",
-                                    borderRadius: "50%",
-                                    backgroundColor: online ? "blue" : "gray",
-                                    border: "2px solid white",
-                                  }}
-                                />
-                              </div>
-                            )}
-                            <span className="text-truncate" style={{ maxWidth: "200px" }}>
-                              {getChatDisplayName(chat)}
-                            </span>
-                          </div>
-                          {unreadChats.has(chat._id) && <Badge bg="danger" pill>•</Badge>}
-                        </ListGroup.Item>
-                      );
-                    })
+                    return (
+                      <ListGroup.Item
+                        key={chat._id}
+                        action
+                        active={selectedChat?._id === chat._id}
+                        onClick={() => setSelectedChat(chat)}
+                        className="d-flex justify-content-between align-items-center"
+                        style={{
+                          borderBottom: "1px solid #ddd",
+                          fontWeight: selectedChat?._id === chat._id ? "bold" : "normal",
+                          fontSize: "1rem",
+                          padding: "0.75rem 1rem",
+                          backgroundColor: "var(--background)",
+                          color: "var(--text)",
+                        }}
+                      >
+                        <div className="d-flex align-items-center gap-2">
+                          {!chat.isGroupChat && otherUser && (
+                            <div style={{ position: "relative" }}>
+                              <Image
+                                src={`${BASE_URL}${otherUser?.avatar || "/default-avatar.png"}`}
+                                roundedCircle
+                                width={45}
+                                height={45}
+                                style={{
+                                  objectFit: "cover",
+                                  border: "1px solid #ccc",
+                                }}
+                              />
+                              <span
+                                style={{
+                                  position: "absolute",
+                                  bottom: 0,
+                                  right: 0,
+                                  width: "10px",
+                                  height: "10px",
+                                  borderRadius: "50%",
+                                  backgroundColor: online ? "blue" : "gray",
+                                  border: "2px solid white",
+                                }}
+                              />
+                            </div>
+                          )}
+                          <span
+                            className="text-truncate"
+                            style={{
+                              maxWidth: "200px",
+                              color: "var(--text)",
+                            }}
+                          >
+                            {getChatDisplayName(chat)}
+                          </span>
+                        </div>
+                        {unreadChats.has(chat._id) && <Badge bg="danger" pill>•</Badge>}
+                      </ListGroup.Item>
+                    );
+                  })
                 )}
               </ListGroup>
             )}
           </div>
 
+          {/* Bottom Section */}
           <div className="p-3 border-top d-flex flex-column gap-2">
-            <Button
-              variant="outline-secondary"
-              className="w-100 d-flex align-items-center gap-2"
-              onClick={toggleTheme}
-            >
-              {darkMode ? <FaSun /> : <FaMoon />}{" "}
-              {darkMode ? "Light Mode" : "Dark Mode"}
-            </Button>
-            <Button
-              variant="outline-primary"
-              size="sm"
-              className="w-100"
-              onClick={() => navigate("/account")}
-            >
-              Account
-            </Button>
+            <div className="d-flex justify-content-between align-items-center">
+              <Button
+                variant="outline-primary"
+                size="sm"
+                className="w-75"
+                onClick={() => navigate("/account")}
+              >
+                Account
+              </Button>
+              <ThemePicker />
+            </div>
             <Button
               variant="outline-danger"
               size="sm"
@@ -297,14 +295,14 @@ export default function Sidebar({
           </div>
         </div>
       </div>
-
+      {/* Profile Modal */}
       <Modal show={showProfile} onHide={() => setShowProfile(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>Your Profile</Modal.Title>
         </Modal.Header>
         <Modal.Body className="text-center">
           <Image
-            src={`https://chatverse-backend-0c8u.onrender.com${user?.avatar || "/default-avatar.png"}`}
+            src={`${BASE_URL}${user?.avatar || "/default-avatar.png"}`}
             roundedCircle
             width={200}
             height={200}
@@ -316,6 +314,7 @@ export default function Sidebar({
         </Modal.Body>
       </Modal>
 
+      {/* Group Create Modal */}
       <Modal show={showGroupModal} onHide={() => setShowGroupModal(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>Create Group Chat</Modal.Title>
@@ -345,9 +344,7 @@ export default function Sidebar({
           {searchResults.map((u) => (
             <Button
               key={u._id}
-              variant={
-                selectedMembers.find((m) => m._id === u._id) ? "success" : "light"
-              }
+              variant={selectedMembers.find((m) => m._id === u._id) ? "success" : "light"}
               className="w-100 mb-2 text-start"
               onClick={() => toggleMember(u)}
             >

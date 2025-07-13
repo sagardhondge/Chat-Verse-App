@@ -1,10 +1,15 @@
-// src/pages/RegisterPage.jsx
+import { useEffect } from "react";
 import RegisterForm from "../components/Auth/RegisterForm";
 import { useTheme } from "../context/ThemeContext";
-import registerBg from "./register.jpg"; // ✅ your local background image
+import registerBg from "./register.jpg";
 
 export default function RegisterPage() {
   const { darkMode, toggleTheme } = useTheme();
+
+  // ⬇ Force dark mode once on mount
+  useEffect(() => {
+    if (!darkMode) toggleTheme(); // switch to dark mode if not already
+  }, []);
 
   return (
     <div

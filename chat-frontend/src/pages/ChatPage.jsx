@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import ChatLayout from "../components/chat/ChatLayout";
 import api from "../utils/axios";
 import { useAuth } from "../context/AuthContext";
-
+import ThemePicker from "../components/ThemePicker";
 export default function ChatPage() {
   const { user } = useAuth();
   const [chats, setChats] = useState([]);

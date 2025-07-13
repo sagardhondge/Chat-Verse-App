@@ -1,3 +1,4 @@
+// src/context/SocketContext.jsx
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
 import { useAuth } from "./AuthContext";
@@ -6,32 +7,33 @@ const SocketContext = createContext(null);
 
 export const SocketProvider = ({ children }) => {
   const { user } = useAuth();
+  const socketRef = useRef(null);
   const [socket, setSocket] = useState(null);
-  const socketRef = useRef(null); // keep reference to current socket
 
   useEffect(() => {
-    // If no token, clean up
-    if (!user?.token) {
+    const token = user?.token;
+
+    if (!token) {
       console.warn("🚫 No token found for socket connection.");
       if (socketRef.current) {
         socketRef.current.disconnect();
         socketRef.current = null;
+        setSocket(null);
       }
-      setSocket(null);
       return;
     }
 
-    console.log("🪪 Socket connecting with token:", user.token);
-
-    // Disconnect old socket before reconnecting
     if (socketRef.current) {
-      socketRef.current.disconnect();
+      console.log("ℹ️ Socket already connected.");
+      return;
     }
 
+    console.log("🪪 Connecting socket with token:", token);
+
     const newSocket = io(import.meta.env.VITE_API_URL, {
-      auth: { token: user.token },
+      auth: { token },
       withCredentials: true,
-      transports: ["websocket"], // recommended for performance
+      transports: ["websocket"],
     });
 
     newSocket.on("connect", () => {
@@ -50,9 +52,12 @@ export const SocketProvider = ({ children }) => {
     setSocket(newSocket);
 
     return () => {
+      console.log("🛑 Cleaning up socket...");
       newSocket.disconnect();
+      socketRef.current = null;
+      setSocket(null);
     };
-  }, [user?.token]); // Re-run effect when token changes
+  }, [user?.token]);
 
   return (
     <SocketContext.Provider value={socket}>

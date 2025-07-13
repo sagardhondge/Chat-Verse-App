@@ -8,9 +8,10 @@ export default function LoginPage() {
   const [animate, setAnimate] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => setAnimate(true), 100); // slight delay
+    if (darkMode) toggleTheme();
+    const timer = setTimeout(() => setAnimate(true), 100);
     return () => clearTimeout(timer);
-  }, []);
+  }, []); 
 
   return (
     <div
@@ -55,7 +56,9 @@ export default function LoginPage() {
             title="Toggle theme"
             style={{ fontSize: "1.2rem" }}
           >
-            {darkMode ? "🌞" : "🌙"}
+            <span role="img" aria-label="theme-toggle">
+              {darkMode ? "🌞" : "🌙"}
+            </span>
           </button>
         </div>
 

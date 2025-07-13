@@ -1,22 +1,29 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import { themes } from "../theme";
 
 const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
-  const [darkMode, setDarkMode] = useState(() =>
-    localStorage.getItem("chat-theme") === "light"
-  );
+  const [themeName, setThemeName] = useState(() => {
+    const stored = localStorage.getItem("chat-theme");
+    return themes[stored] ? stored : "light";
+  });
+
+  const theme = themes[themeName];
 
   useEffect(() => {
-    document.body.className = darkMode ? "bg-dark text-white" : "bg-light text-dark";
-    localStorage.setItem("chat-theme", darkMode ? "dark" : "light");
-  }, [darkMode]);
+    localStorage.setItem("chat-theme", themeName);
+    document.documentElement.setAttribute("data-theme", themeName);
+  }, [themeName]);
 
   return (
-    <ThemeContext.Provider value={{ darkMode, toggleTheme: () => setDarkMode((p) => !p) }}>
+    <ThemeContext.Provider value={{ themeName, setThemeName, theme }}>
       {children}
     </ThemeContext.Provider>
   );
 };
 
-export const useTheme = () => useContext(ThemeContext);
+// ✅ Place custom hook *after* the component
+export function useTheme() {
+  return useContext(ThemeContext);
+}

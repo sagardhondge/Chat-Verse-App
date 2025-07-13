@@ -1,34 +1,32 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Form, Button } from "react-bootstrap";
-import api from "../../utils/axios"; // ✅ changed from axios to api
+import api from "../../utils/axios"; // ✅ Using configured Axios
 import { useAuth } from "../../context/AuthContext";
 import { useTheme } from "../../context/ThemeContext";
 
 export default function LoginForm() {
   const { setUser } = useAuth();
-  const { darkMode, toggleTheme } = useTheme();
+  const { darkMode } = useTheme();
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleLogin = async (e) => {
-  e.preventDefault();
-  try {
-    const { data } = await api.post("/user/login", {
-      email,
-      password,
-    });
+    e.preventDefault();
+    try {
+      const { data } = await api.post("/user/login", { email, password });
 
-    const fullUser = { ...data.user, token: data.token };
-    setUser(fullUser);
-    localStorage.setItem("chat-user", JSON.stringify(fullUser));
-    navigate("/");
-  } catch (err) {
-    alert(err.response?.data?.message || "Login failed");
-  }
-};
+      const fullUser = { ...data.user, token: data.token };
+      setUser(fullUser);
+      localStorage.setItem("chat-user", JSON.stringify(fullUser));
+      navigate("/");
+    } catch (err) {
+      alert(err.response?.data?.message || "Login failed");
+    }
+  };
+
   return (
     <div
       style={{

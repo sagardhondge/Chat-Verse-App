@@ -16,13 +16,13 @@ import { SocketProvider } from "./context/SocketContext";
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <ThemeProvider>
-      <AuthProvider>
-        <SocketProvider>
-          <BrowserRouter>
+      <BrowserRouter>
+        <AuthProvider>
+          <SocketProvider>
             <App />
-          </BrowserRouter>
-        </SocketProvider>
-      </AuthProvider>
+          </SocketProvider>
+        </AuthProvider>
+      </BrowserRouter>
     </ThemeProvider>
   </React.StrictMode>
 );

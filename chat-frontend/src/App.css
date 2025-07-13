@@ -784,3 +784,15 @@ body.bg-dark a:hover {
     box-shadow: 0 0 4px rgba(200, 200, 200, 0.4);
   }
 }
+body {
+  background-color: var(--background);
+  color: var(--text);
+}
+
+.btn-primary {
+  background-color: var(--primary);
+}
+
+.btn-secondary {
+  background-color: var(--secondary);
+}

@@ -3,13 +3,14 @@ import { useNavigate, Link } from "react-router-dom";
 import { Form, Button, Card } from "react-bootstrap";
 import { useTheme } from "../../context/ThemeContext";
 import { useAuth } from "../../context/AuthContext";
-import api from "../../utils/axios"; // ✅ Use custom axios instance
+import api from "../../utils/axios"; // ✅ Uses dynamic backend from .env
 
 export default function RegisterForm() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
   const { darkMode } = useTheme();
   const { setUser } = useAuth();
   const navigate = useNavigate();
@@ -45,6 +46,7 @@ export default function RegisterForm() {
       }}
     >
       <h5 className="text-center fw-bold mb-4">Create an Account</h5>
+
       <Form onSubmit={handleSubmit}>
         <Form.Group className="mb-3">
           <Form.Label>First Name</Form.Label>

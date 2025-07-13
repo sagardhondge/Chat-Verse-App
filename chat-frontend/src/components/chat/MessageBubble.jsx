@@ -1,11 +1,14 @@
 import { useAuth } from "../../context/AuthContext";
-import { useTheme } from "../../context/ThemeContext";
+import { themes } from "../../theme";
 import { Image } from "react-bootstrap";
 import "./MessageBubble.css";
+import api from "../../utils/axios";
 
 export default function MessageBubble({ message }) {
   const { user } = useAuth();
-  const { darkMode } = useTheme();
+  const themeName = localStorage.getItem("chat-theme") || "light";
+  const theme = themes[themeName] || themes.light;
+
   const isSender = message.sender._id === user._id;
 
   const firstName = message.sender?.firstName ?? "";
@@ -20,7 +23,7 @@ export default function MessageBubble({ message }) {
     file?.endsWith(".gif") ||
     file?.endsWith(".webp");
 
-  const BASE_URL = "https://chatverse-backend-0c8u.onrender.com";
+  const BASE_API = import.meta.env.VITE_API_URL;
 
   const getFileName = (path) => path?.split("/").pop();
   const getReadableSize = (bytes) => {
@@ -34,58 +37,75 @@ export default function MessageBubble({ message }) {
     return `${bytes.toFixed(1)} ${units[i]}`;
   };
 
+  const bubbleStyle = {
+    backgroundColor: isSender ? theme.primary : theme.surface,
+    color: isSender ? "#fff" : theme.text,
+    borderRadius: "1rem",
+    padding: "0.6rem 1rem",
+    maxWidth: "75%",
+    wordWrap: "break-word",
+    boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+  };
+
+  const senderNameStyle = {
+    color: theme.subtext,
+    fontSize: "0.85rem",
+    fontWeight: 600,
+    marginBottom: "2px",
+  };
+
+  const timeStyle = {
+    textAlign: "right",
+    fontSize: "0.75rem",
+    marginTop: "4px",
+    color: theme.subtext,
+  };
+
   return (
     <div className={`d-flex ${isSender ? "justify-content-end" : "justify-content-start"} mb-3`}>
-      <div
-        className={`message-bubble ${isSender ? "sender" : darkMode ? "receiver-dark" : "receiver-light"}`}
-        style={{
-          color: isSender ? "#fff" : darkMode ? "#eee" : "#111",
-          backgroundColor: isSender ? "#0d6efd" : darkMode ? "#2c2c2c" : "#f1f1f1",
-        }}
-      >
+      <div className="message-bubble" style={bubbleStyle}>
         {!isSender && (
-          <div
-            className="sender-name"
-            style={{
-              color: darkMode ? "#fff" : "#000",
-              fontSize: "0.85rem",
-              fontWeight: 500,
-              marginBottom: "2px",
-            }}
-          >
+          <div className="sender-name" style={senderNameStyle}>
             {fullName}
           </div>
         )}
 
-        <div className="message-content">{message.content}</div>
+        {message.content && (
+          <div className="message-content">{message.content}</div>
+        )}
 
         {message.file && (
           <div className="message-file mt-2">
             {isImage(message.file) ? (
               <img
-                src={`${BASE_URL}${message.file}`}
+                src={`${BASE_API}${message.file}`}
                 alt="Sent File"
-                style={{ maxWidth: "200px", borderRadius: "8px", marginBottom: "5px" }}
+                style={{
+                  maxWidth: "200px",
+                  borderRadius: "8px",
+                  marginTop: "5px",
+                }}
               />
             ) : (
               <a
-                href={`${BASE_URL}${message.file}`}
+                href={`${BASE_API}${message.file}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{
                   display: "inline-block",
                   textDecoration: "underline",
-                  color: isSender ? "#fff" : darkMode ? "#ddd" : "#007bff",
+                  color: isSender ? "#fff" : theme.link,
                 }}
               >
                 📎 View File
               </a>
             )}
+
             <div
               style={{
                 fontSize: "0.75rem",
                 marginTop: "2px",
-                color: darkMode ? "#bbb" : "#555",
+                color: theme.subtext,
               }}
             >
               {getFileName(message.file)}
@@ -94,15 +114,7 @@ export default function MessageBubble({ message }) {
           </div>
         )}
 
-        <div
-          className="message-time"
-          style={{
-            textAlign: "right",
-            fontSize: "0.75rem",
-            marginTop: "4px",
-            color: darkMode ? "#ccc" : "#666",
-          }}
-        >
+        <div className="message-time" style={timeStyle}>
           {new Date(message.createdAt).toLocaleTimeString([], {
             hour: "2-digit",
             minute: "2-digit",
