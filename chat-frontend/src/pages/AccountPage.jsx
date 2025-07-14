@@ -71,11 +71,13 @@ export default function AccountPage() {
         },
       };
 
+      console.log("🔄 Sending update profile request...");
       const { data } = await axios.put(
         "https://chatverse-backend-0c8u.onrender.com/api/user/profile",
         form,
         config
       );
+      console.log("✅ Update response:", data);
 
       const fullUser = {
         ...user,
@@ -87,8 +89,8 @@ export default function AccountPage() {
 
       alert("✅ Profile updated successfully");
     } catch (error) {
-      console.error("❌ Update failed", error);
-      alert("Failed to update profile");
+      console.error("❌ Update failed:", error?.response || error.message);
+      alert("❌ Failed to update profile");
     } finally {
       setSaving(false);
     }
@@ -106,11 +108,13 @@ export default function AccountPage() {
         headers: { Authorization: `Bearer ${user.token}` },
       };
 
+      console.log("🔒 Verifying password...");
       const { data } = await axios.post(
         "https://chatverse-backend-0c8u.onrender.com/api/user/verify-password",
         { password: deletePassword },
         config
       );
+      console.log("🔐 Password verification result:", data);
 
       if (data.valid) {
         await axios.delete(
@@ -125,7 +129,7 @@ export default function AccountPage() {
         alert("❌ Incorrect password");
       }
     } catch (err) {
-      console.error("❌ Delete failed", err);
+      console.error("❌ Delete failed:", err?.response || err.message);
       alert("Something went wrong");
     } finally {
       setDeleting(false);
