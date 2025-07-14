@@ -51,6 +51,7 @@ app.use(
   })
 );
 
+app.options("*", cors()); // ✅ handle preflight
 app.use(express.json());
 app.use(cookieParser());
 
@@ -70,7 +71,7 @@ connection();
 // ✅ Step 8: Start server
 const PORT = process.env.PORT || 4000;
 server.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
 
 // ✅ Step 9: Initialize Socket.IO
