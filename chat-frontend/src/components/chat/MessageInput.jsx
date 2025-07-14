@@ -90,8 +90,8 @@ export default function MessageInput({ newMessage, setNewMessage, onSend, onFile
         onKeyDown={handleKeyDown}
         style={{
           resize: "none",
-          backgroundColor: theme.input,
-          color: theme.text,
+          backgroundColor: "#ffffff",  // Force white background
+          color: "#000000",            // Force black text
           borderColor: theme.border,
         }}
       />

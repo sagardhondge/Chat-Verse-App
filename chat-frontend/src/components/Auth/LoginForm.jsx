@@ -33,7 +33,7 @@ export default function LoginForm() {
         borderRadius: "1.5rem",
         background: darkMode
           ? "rgba(69, 13, 13, 0.2)"
-          : "rgba(119, 165, 162, 0.83)",
+          : "rgba(94, 157, 150, 0.67)",
         backdropFilter: "blur(12px)",
         padding: "2.5rem 2rem",
         boxShadow: darkMode
@@ -78,18 +78,25 @@ export default function LoginForm() {
           variant="primary"
           className="w-100 mb-3 rounded py-2 fw-semibold"
           style={{
-            backgroundColor: "#1a73e8",
+            backgroundColor: "#d9d7d7ff",
             border: "none",
-            boxShadow: "0 4px 10px rgba(26, 115, 232, 0.4)",
+            boxShadow: "0 4px 10px rgba(163, 168, 175, 0.4)",
           }}
         >
           Login
         </Button>
       </Form>
 
-      <div className="text-center">
-        New here?{" "}
-        <Link to="/register" className="text-info text-decoration-none">
+      <div className="text-center mt-3">
+        Don't have an account?{" "}
+          <Link
+          to="/register"
+          style={{
+            color: "#007bff", 
+            fontWeight: "600",
+            textDecoration: "underline",
+          }}
+        >
           Sign up
         </Link>
       </div>

@@ -37,7 +37,7 @@ export const SocketProvider = ({ children }) => {
     });
 
     newSocket.on("connect", () => {
-      console.log("✅ Socket connected successfully");
+      console.log(" Socket connected successfully");
     });
 
     newSocket.on("disconnect", (reason) => {
@@ -45,14 +45,14 @@ export const SocketProvider = ({ children }) => {
     });
 
     newSocket.on("connect_error", (err) => {
-      console.error("❌ Socket connection error:", err.message);
+      console.error(" Socket connection error:", err.message);
     });
 
     socketRef.current = newSocket;
     setSocket(newSocket);
 
     return () => {
-      console.log("🛑 Cleaning up socket...");
+      console.log(" Cleaning up socket...");
       newSocket.disconnect();
       socketRef.current = null;
       setSocket(null);
