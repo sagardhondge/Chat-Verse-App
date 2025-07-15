@@ -8,7 +8,7 @@ import Sidebar from "../Sidebar";
 import GroupInfoModal from "../modals/GroupInfoModal";
 import { useNavigate } from "react-router-dom";
 import api from "../../utils/axios";
-import { BiTrash } from "react-icons/bi"; // ✅ Modern trash icon
+import { BiTrash } from "react-icons/bi";
 import { themes } from "../../theme";
 
 export default function ChatLayout() {
@@ -32,7 +32,6 @@ export default function ChatLayout() {
   const [searchLoading, setSearchLoading] = useState(false);
   const [unreadCounts, setUnreadCounts] = useState({});
 
-  // 🟢 Real-time theme update
   useEffect(() => {
     const observer = new MutationObserver(() => {
       const current = localStorage.getItem("chat-theme") || "light";
@@ -105,18 +104,9 @@ export default function ChatLayout() {
       });
     };
 
-    const handleUnread = ({ chatId }) => {
-      if (selectedChat?._id !== chatId) {
-        setUnreadCounts((prev) => ({ ...prev, [chatId]: (prev[chatId] || 0) + 1 }));
-      }
-    };
-
     socket.on("messageReceived", handleMessageReceived);
-    socket.on("chatHasUnread", handleUnread);
-
     return () => {
       socket.off("messageReceived", handleMessageReceived);
-      socket.off("chatHasUnread", handleUnread);
     };
   }, [socket, selectedChat]);
 
@@ -198,124 +188,155 @@ export default function ChatLayout() {
   };
 
   return (
-    <div style={{ backgroundColor: theme.background, color: theme.text }} className="d-flex vh-100">
-      <Sidebar
-        chats={chats}
-        selectedChat={selectedChat}
-        setSelectedChat={setSelectedChat}
-        getChatDisplayName={getChatDisplayName}
-        loading={loading}
-      />
+    <div
+      style={{
+        backgroundColor: theme.background,
+        color: theme.text,
+        height: "100vh",
+        display: "flex",
+        justifyContent: "center",
+      }}
+    >
+      <div style={{ display: "flex" }}>
+        <Sidebar
+          chats={chats}
+          selectedChat={selectedChat}
+          setSelectedChat={setSelectedChat}
+          getChatDisplayName={getChatDisplayName}
+          loading={loading}
+        />
 
-      <div className="flex-grow-1 d-flex flex-column" style={{ minWidth: "60%" }}>
         <div
+          className="flex-grow-1 d-flex flex-column"
           style={{
-            backgroundColor: theme.card,
-            borderBottom: `1px solid ${theme.border}`,
-            padding: "1rem",
+            maxWidth: "950px",
+            minWidth: "100%",
+            borderLeft: `2px solid ${theme.border}`,
+            borderRight: "2px solid var(--secondary)",
+            borderTop: "2px solid var(--secondary)",
+            borderBottom: "2px solid var(--secondary)",
+            backgroundColor: theme.surface,
           }}
-          className="d-flex justify-content-between align-items-center"
         >
-          <div className="d-flex align-items-center gap-3">
-            <h5 className="mb-0">
+          {/* Header */}
+          <div className="d-flex justify-content-between align-items-center px-4 py-3" style={{ backgroundColor: theme.card, 
+            borderBottom: "2px solid var(--secondary)" }}>
+            <h5 className="mb-0 text-truncate">
               {selectedChat
                 ? selectedChat.isGroupChat
                   ? selectedChat.chatName
                   : getChatDisplayName(selectedChat)
                 : "Select a chat to start messaging"}
             </h5>
-
-            {selectedChat?.isGroupChat && (
-              <Button variant="outline-secondary" size="sm" onClick={() => setShowGroupInfo(true)}>
-                ⚙️
-              </Button>
-            )}
-
-            {selectedChat && (
-              <Button variant="outline-danger" size="sm" onClick={() => setSelectedChat(null)}>
-                ×
-              </Button>
-            )}
+            <div className="d-flex gap-2 align-items-center">
+              {selectedChat?.isGroupChat && (
+                <Button variant="outline-secondary" size="sm" onClick={() => setShowGroupInfo(true)}>
+                  ⚙️
+                </Button>
+              )}
+              {selectedChat && (
+                <Button variant="outline-danger" size="sm" onClick={() => setSelectedChat(null)}>
+                  ×
+                </Button>
+              )}
+            </div>
           </div>
-        </div>
 
-        <Form onSubmit={handleSearch} style={{ backgroundColor: theme.card, borderBottom: `1px solid ${theme.border}`, padding: "0.5rem 1rem" }}>
-          <InputGroup>
-            <Form.Control
-              placeholder="Search users..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              style={{ backgroundColor: theme.input, color: theme.text, borderColor: theme.border }}
-            />
-            <Button type="submit" variant="secondary">
-              {searchLoading ? <Spinner size="sm" animation="border" /> : "Search"}
-            </Button>
-          </InputGroup>
-        </Form>
-
-        {searchResults.length > 0 && (
-          <div style={{ backgroundColor: theme.card, borderBottom: `1px solid ${theme.border}`, padding: "0.5rem 1rem" }}>
-            <ListGroup>
-              {searchResults.map((u) => (
-                <ListGroup.Item
-                  key={u._id}
-                  action
-                  className="d-flex align-items-center gap-2"
-                  onClick={() => startNewChat(u._id)}
-                  style={{ backgroundColor: theme.surface, color: theme.text }}
-                >
-                  <div>
-                    <div>{u.firstName} {u.lastName}</div>
-                    <div style={{ fontSize: "0.8rem", color: theme.subtext }}>{u.email}</div>
-                  </div>
-                </ListGroup.Item>
-              ))}
-            </ListGroup>
-          </div>
-        )}
-
-        <div className="flex-grow-1 px-3 py-2 overflow-auto" style={{ backgroundColor: theme.surface }}>
-          {selectedChat && messages.length > 0 && (
-            <div className="text-end mb-2">
-              <Button
-                variant="outline-danger"
-                size="sm"
-                onClick={async () => {
-                  if (window.confirm("Delete all your messages in this chat?")) {
-                    try {
-                      await api.delete(`/message/chat/${selectedChat._id}`);
-                      const { data } = await api.get(`/message/${selectedChat._id}`);
-                      setMessages(data);
-                      alert("Messages deleted.");
-                    } catch {
-                      alert("Failed to delete messages.");
-                    }
-                  }
-                }}
-              >
-                <BiTrash size={18} />
+          {/* Search bar */}
+          <Form onSubmit={handleSearch} className="px-4 py-2" style={{ backgroundColor: theme.card, borderBottom: "2px solid var(--secondary)" }}>
+            <InputGroup>
+              <Form.Control
+                placeholder="Search users..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                style={{ backgroundColor: theme.input, color: theme.text, borderColor: theme.border }}
+              />
+              <Button type="submit" variant="secondary">
+                {searchLoading ? <Spinner size="sm" animation="border" /> : "Search"}
               </Button>
+            </InputGroup>
+          </Form>
+
+          {/* Search Results */}
+          {searchResults.length > 0 && (
+            <div className="px-4 py-2" style={{ backgroundColor: theme.card }}>
+              <ListGroup>
+                {searchResults.map((u) => (
+                  <ListGroup.Item
+                    key={u._id}
+                    action
+                    className="d-flex align-items-center gap-2"
+                    onClick={() => startNewChat(u._id)}
+                    style={{ backgroundColor: theme.surface, color: theme.text }}
+                  >
+                    <div>
+                      <div>{u.firstName} {u.lastName}</div>
+                      <div style={{ fontSize: "0.8rem", color: theme.subtext }}>{u.email}</div>
+                    </div>
+                  </ListGroup.Item>
+                ))}
+              </ListGroup>
             </div>
           )}
 
-          {selectedChat ? (
-            messages.map((msg) => <MessageBubble key={msg._id} message={msg} />)
-          ) : (
-            <div className="text-center mt-5">Please select a chat.</div>
-          )}
-          <div ref={chatEndRef} />
-        </div>
+          {/* Messages */}
+          <div className="flex-grow-1 px-4 overflow-auto"
+            style={{
+              backgroundColor: theme.surface,
+              paddingTop: "1rem",
+              paddingBottom: "1rem"
+            }}
+          >
+            {selectedChat && messages.length > 0 && (
+              <div className="text-end mb-2">
+                <Button
+                  variant="outline-danger"
+                  size="sm"
+                  onClick={async () => {
+                    if (window.confirm("Delete all your messages in this chat?")) {
+                      try {
+                        await api.delete(`/message/chat/${selectedChat._id}`);
+                        const { data } = await api.get(`/message/${selectedChat._id}`);
+                        setMessages(data);
+                        alert("Messages deleted.");
+                      } catch {
+                        alert("Failed to delete messages.");
+                      }
+                    }
+                  }}
+                >
+                  <BiTrash size={18} />
+                </Button>
+              </div>
+            )}
 
-        <div style={{ backgroundColor: theme.card, borderTop: `1px solid ${theme.border}`, padding: "1rem" }}>
-          <MessageInput
-            newMessage={newMessage}
-            setNewMessage={setNewMessage}
-            onSend={handleSendMessage}
-            onFileSelect={handleFileUpload}
-          />
+            {selectedChat ? (
+              messages.map((msg) => <MessageBubble key={msg._id} message={msg} />)
+            ) : (
+              <div className="text-center mt-5">Please select a chat.</div>
+            )}
+            <div ref={chatEndRef} />
+          </div>
+
+          {/* Message Input */}
+          <div
+            style={{
+              backgroundColor: theme.card,
+              borderTop: "2px solid var(--secondary)",
+              padding: "1rem",
+            }}
+          >
+            <MessageInput
+              newMessage={newMessage}
+              setNewMessage={setNewMessage}
+              onSend={handleSendMessage}
+              onFileSelect={handleFileUpload}
+            />
+          </div>
         </div>
       </div>
 
+      {/* Group Info Modal */}
       {selectedChat?.isGroupChat && (
         <GroupInfoModal
           show={showGroupInfo}

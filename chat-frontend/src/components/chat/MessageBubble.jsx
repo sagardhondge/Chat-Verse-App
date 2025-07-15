@@ -38,13 +38,13 @@ export default function MessageBubble({ message }) {
   };
 
   const bubbleStyle = {
-    backgroundColor: isSender ? theme.primary : theme.surface,
-    color: isSender ? "#fff" : theme.text,
+    backgroundColor: isSender ? theme.secondary : "#5a6f71ff",
+    color: "#fff",
     borderRadius: "1rem",
     padding: "0.6rem 1rem",
     maxWidth: "75%",
     wordWrap: "break-word",
-    boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+    boxShadow: "0 1px 3px rgba(174, 168, 168, 0.1)",
   };
 
   const senderNameStyle = {
@@ -66,7 +66,7 @@ export default function MessageBubble({ message }) {
       <div className="message-bubble" style={bubbleStyle}>
         {!isSender && (
           <div className="sender-name" style={senderNameStyle}>
-            {fullName}
+            {}
           </div>
         )}
 

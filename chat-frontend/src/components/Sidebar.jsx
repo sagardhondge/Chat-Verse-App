@@ -1,3 +1,4 @@
+// src/components/Sidebar.jsx
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
@@ -25,6 +26,7 @@ export default function Sidebar({
   setSelectedChat,
   getChatDisplayName,
   loading,
+  unreadCounts = {},
 }) {
   const { user, logout, onlineUsers = [] } = useAuth();
   const { themeName } = useTheme();
@@ -40,7 +42,6 @@ export default function Sidebar({
   const [selectedMembers, setSelectedMembers] = useState([]);
   const [searchLoading, setSearchLoading] = useState(false);
   const [creating, setCreating] = useState(false);
-  const [unreadChats, setUnreadChats] = useState(new Set());
 
   const handleLogout = () => {
     logout();
@@ -71,7 +72,6 @@ export default function Sidebar({
       const { data } = await api.get(`/user?search=${searchTerm}`);
       setSearchResults(data);
     } catch (err) {
-      console.error(err);
       alert("Search users failed");
     } finally {
       setSearchLoading(false);
@@ -97,34 +97,13 @@ export default function Sidebar({
         users: selectedMembers.map((m) => m._id),
       });
       setSelectedChat(res.data);
-      chats.unshift(res.data);
       setShowGroupModal(false);
-    } catch (err) {
-      console.error(err);
+    } catch {
       alert("Create group failed");
     } finally {
       setCreating(false);
     }
   };
-
-  useEffect(() => {
-    if (!socket) return;
-    const handleUnread = ({ chatId }) => {
-      setUnreadChats((prev) => new Set(prev).add(chatId));
-    };
-    socket.on("chatHasUnread", handleUnread);
-    return () => socket.off("chatHasUnread", handleUnread);
-  }, [socket]);
-
-  useEffect(() => {
-    if (selectedChat?._id) {
-      setUnreadChats((prev) => {
-        const updated = new Set(prev);
-        updated.delete(selectedChat._id);
-        return updated;
-      });
-    }
-  }, [selectedChat]);
 
   return (
     <>
@@ -132,8 +111,8 @@ export default function Sidebar({
         <div
           className="glow-border"
           style={{
-            width: "4px",
-            backgroundColor: "gray",
+            width: "60px",
+           backgroundColor: "var(--background)",
             height: "100vh",
             borderRadius: "0 4px 4px 0",
           }}
@@ -142,37 +121,36 @@ export default function Sidebar({
         <div
           className="d-flex flex-column justify-content-between"
           style={{
-            width: "300px",
+            width: "450px",
             height: "100vh",
             fontFamily: "Segoe UI, sans-serif",
             backgroundColor: "var(--background)",
             color: "var(--text)",
             borderLeft: "2px solid var(--secondary)",
             borderRight: "2px solid var(--secondary)",
+            border: "2px solid var(--secondary)",
             overflowY: "auto",
-            transition: "all 0.3s ease",
           }}
         >
           {/* Top Section */}
           <div>
             <div
               className="d-flex align-items-center gap-2 p-3 border-bottom"
-              style={{ cursor: "pointer" }}
+              style={{
+                borderBottom: "2px solid var(--secondary)",
+                cursor: "pointer",
+                backgroundColor: "var(--primary)",
+              }}
               onClick={() => setShowProfile(true)}
             >
               <Image
                 src={`${BASE_URL}${user?.avatar || "/default-avatar.png"}`}
                 roundedCircle
-                width={40}
-                height={40}
+                width={45}
+                height={45}
                 style={{ border: "2px solid #ccc" }}
               />
-              <strong
-                className="text-truncate"
-                style={{ color: "var(--text)" }}
-              >
-                {user?.firstName} {user?.lastName}
-              </strong>
+              <strong className="text-truncate">{user?.firstName} {user?.lastName}</strong>
             </div>
 
             <div className="d-flex justify-content-between align-items-center px-3 py-2 border-bottom">
@@ -181,7 +159,7 @@ export default function Sidebar({
                 className="d-flex align-items-center"
                 style={{ cursor: "pointer" }}
               >
-                <span className="fw-semibold me-2" style={{ color: "var(--text)" }}>Chats</span>
+                <span className="fw-semibold me-2">Chats</span>
                 {isChatListOpen ? <FaChevronUp /> : <FaChevronDown />}
               </div>
               <Button variant="link" onClick={openGroupModal} title="Create Group Chat">
@@ -195,9 +173,11 @@ export default function Sidebar({
                 className="chat-scroll"
                 style={{
                   overflowY: "auto",
-                  maxHeight: "70vh",
-                  fontFamily: "Segoe UI, sans-serif",
+                  maxHeight: "77vh",
                   backgroundColor: "var(--background)",
+                  border: "2px solid var(--secondary)",
+                  borderRadius: "0 0 4px 4px",
+                  color: "var(--text)",                                             
                 }}
               >
                 {loading ? (
@@ -233,10 +213,7 @@ export default function Sidebar({
                                 roundedCircle
                                 width={45}
                                 height={45}
-                                style={{
-                                  objectFit: "cover",
-                                  border: "1px solid #ccc",
-                                }}
+                                style={{ objectFit: "cover", border: "1px solid #ccc" }}
                               />
                               <span
                                 style={{
@@ -246,23 +223,19 @@ export default function Sidebar({
                                   width: "10px",
                                   height: "10px",
                                   borderRadius: "50%",
-                                  backgroundColor: online ? "blue" : "gray",
+                                  backgroundColor: online ? "orange" : "gray",
                                   border: "2px solid white",
                                 }}
                               />
                             </div>
                           )}
-                          <span
-                            className="text-truncate"
-                            style={{
-                              maxWidth: "200px",
-                              color: "var(--text)",
-                            }}
-                          >
+                          <span className="text-truncate" style={{ maxWidth: "200px" }}>
                             {getChatDisplayName(chat)}
                           </span>
                         </div>
-                        {unreadChats.has(chat._id) && <Badge bg="danger" pill>•</Badge>}
+                        {unreadCounts[chat._id] > 0 && (
+                          <Badge bg="danger" pill>{unreadCounts[chat._id]}</Badge>
+                        )}
                       </ListGroup.Item>
                     );
                   })
@@ -295,6 +268,7 @@ export default function Sidebar({
           </div>
         </div>
       </div>
+
       {/* Profile Modal */}
       <Modal show={showProfile} onHide={() => setShowProfile(false)} centered>
         <Modal.Header closeButton>
