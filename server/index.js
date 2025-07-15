@@ -20,22 +20,18 @@ const server = http.createServer(app);
 
 const allowedOrigins = [
   "https://chatverseapp.vercel.app",
-  "http://localhost:5173"
+  "http://localhost:5173",
+  
 ];
 
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        console.log("❌ CORS blocked origin:", origin);
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true,
-  })
-);
+const corsOptions = {
+  origin: allowedOrigins,
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+
+app.use(cors(corsOptions));
 
 // ✅ Apply CORS for Socket.IO
 const io = new Server(server, {

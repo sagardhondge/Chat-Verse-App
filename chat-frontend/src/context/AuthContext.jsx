@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useState, useEffect } from "react";
 
 const AuthContext = createContext();
@@ -13,7 +14,8 @@ export const AuthProvider = ({ children }) => {
     }
   });
 
-  // 🔁 Keep localStorage in sync with user
+  const [onlineUsers, setOnlineUsers] = useState([]);
+
   useEffect(() => {
     if (user) {
       localStorage.setItem("chat-user", JSON.stringify(user));
@@ -22,14 +24,13 @@ export const AuthProvider = ({ children }) => {
     }
   }, [user]);
 
-  // 🚪 Central logout function
   const logout = () => {
     setUser(null);
     localStorage.removeItem("chat-user");
   };
 
   return (
-    <AuthContext.Provider value={{ user, setUser, logout }}>
+    <AuthContext.Provider value={{ user, setUser, logout, onlineUsers, setOnlineUsers }}>
       {children}
     </AuthContext.Provider>
   );

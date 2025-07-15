@@ -33,8 +33,9 @@ router.post("/login", loginUser);
 // Protected
 router.put("/profile", protect, upload.single("avatar"), updateProfile);
 router.get("/me", protect, getMe);
-router.get("/search", protect, searchUsers);    // ✅ Renamed to /search
-router.get("/:id", protect, getUserById);       // ✅ After /search
+router.get("/", protect, searchUsers);        
+router.get("/search", protect, searchUsers);    
+router.get("/:id", protect, getUserById);       
 router.delete("/delete", protect, deleteUser);
 router.post("/verify-password", protect, verifyPassword);
 

@@ -5,7 +5,13 @@ import { Button } from "react-bootstrap";
 import { BsEmojiSmile, BsPaperclip, BsChevronDown } from "react-icons/bs";
 import { themes } from "../../theme";
 
-export default function MessageInput({ newMessage, setNewMessage, onSend, onFileSelect }) {
+export default function MessageInput({
+  newMessage,
+  setNewMessage,
+  onSend,
+  onFileSelect,
+  onTyping,
+}) {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const fileInputRef = useRef(null);
   const emojiPickerRef = useRef(null);
@@ -15,6 +21,7 @@ export default function MessageInput({ newMessage, setNewMessage, onSend, onFile
 
   const handleEmojiSelect = (emoji) => {
     setNewMessage((prev) => prev + emoji.native);
+    onTyping?.();
   };
 
   const handleFileChange = (e) => {
@@ -26,6 +33,8 @@ export default function MessageInput({ newMessage, setNewMessage, onSend, onFile
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       onSend();
+    } else {
+      onTyping?.();
     }
   };
 
@@ -54,7 +63,11 @@ export default function MessageInput({ newMessage, setNewMessage, onSend, onFile
     >
       {/* Emoji Button */}
       <Button
-        style={{ backgroundColor: theme.surface, color: theme.text, border: `1px solid ${theme.border}` }}
+        style={{
+          backgroundColor: theme.surface,
+          color: theme.text,
+          border: `1px solid ${theme.border}`,
+        }}
         onClick={() => setShowEmojiPicker((prev) => !prev)}
         className="emoji-btn"
         title="Emoji"
@@ -64,7 +77,11 @@ export default function MessageInput({ newMessage, setNewMessage, onSend, onFile
 
       {/* File Attach Button */}
       <Button
-        style={{ backgroundColor: theme.surface, color: theme.text, border: `1px solid ${theme.border}` }}
+        style={{
+          backgroundColor: theme.surface,
+          color: theme.text,
+          border: `1px solid ${theme.border}`,
+        }}
         onClick={() => fileInputRef.current.click()}
         className="file-btn"
         title="Attach file"
@@ -86,12 +103,15 @@ export default function MessageInput({ newMessage, setNewMessage, onSend, onFile
         rows={1}
         placeholder="Type a message..."
         value={newMessage}
-        onChange={(e) => setNewMessage(e.target.value)}
+        onChange={(e) => {
+          setNewMessage(e.target.value);
+          onTyping?.();
+        }}
         onKeyDown={handleKeyDown}
         style={{
           resize: "none",
-          backgroundColor: "#ffffff",  // Force white background
-          color: "#000000",            // Force black text
+          backgroundColor: theme.input,
+          color: theme.text,
           borderColor: theme.border,
         }}
       />
@@ -99,7 +119,7 @@ export default function MessageInput({ newMessage, setNewMessage, onSend, onFile
       {/* Send Button */}
       <Button
         variant="primary"
-        onClick={() => onSend()}
+        onClick={onSend}
         disabled={!newMessage.trim()}
         className="fw-semibold"
       >

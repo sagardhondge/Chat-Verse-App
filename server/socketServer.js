@@ -77,15 +77,15 @@ const initSocket = (io) => {
         console.error("❌ newMessage error:", err);
       }
     });
-
-    // ✍️ Typing indicators
-    socket.on("typing", ({ chatId }) => {
-      socket.to(chatId).emit("typing", { user: socket.user, chatId });
+    // Typing indicators
+    socket.on("typing", (chatId) => {
+      socket.to(chatId).emit("typing", chatId, socket.user); // send user info
+    });
+    
+    socket.on("stop typing", (chatId) => {
+      socket.to(chatId).emit("stop typing", chatId);
     });
 
-    socket.on("stopTyping", ({ chatId }) => {
-      socket.to(chatId).emit("stopTyping", { chatId });
-    });
 
     // ✅ Message read acknowledgment
     socket.on("readMessage", ({ chatId }) => {

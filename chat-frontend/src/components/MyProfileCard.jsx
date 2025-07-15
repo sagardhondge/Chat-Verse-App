@@ -50,15 +50,7 @@ export default function GroupInfoModal({ show, onHide, group, updateGroup }) {
       </Modal.Header>
 
       <Modal.Body className="text-center">
-        <Image
-          src="/group-avatar.png"
-          alt="Group"
-          roundedCircle
-          width={100}
-          height={100}
-          className="mb-3"
-        />
-
+       
         <h5>{group.chatName}</h5>
         <p className="text-muted mb-3">
           Admin: {group?.groupAdmin?.firstName} {group?.groupAdmin?.lastName}

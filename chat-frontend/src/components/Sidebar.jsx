@@ -1,4 +1,3 @@
-// src/components/Sidebar.jsx
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
@@ -14,7 +13,7 @@ import {
   InputGroup,
   Spinner,
 } from "react-bootstrap";
-import { FaChevronDown, FaChevronUp, FaUsers } from "react-icons/fa";
+import { FaChevronDown, FaChevronUp, FaUsers, FaWifi } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import ThemePicker from "./ThemePicker";
 
@@ -42,6 +41,7 @@ export default function Sidebar({
   const [selectedMembers, setSelectedMembers] = useState([]);
   const [searchLoading, setSearchLoading] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [showOnlineModal, setShowOnlineModal] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -112,7 +112,7 @@ export default function Sidebar({
           className="glow-border"
           style={{
             width: "60px",
-           backgroundColor: "var(--background)",
+            backgroundColor: "var(--background)",
             height: "100vh",
             borderRadius: "0 4px 4px 0",
           }}
@@ -162,9 +162,14 @@ export default function Sidebar({
                 <span className="fw-semibold me-2">Chats</span>
                 {isChatListOpen ? <FaChevronUp /> : <FaChevronDown />}
               </div>
-              <Button variant="link" onClick={openGroupModal} title="Create Group Chat">
-                <FaUsers />
-              </Button>
+              <div className="d-flex gap-2">
+                <Button variant="link" onClick={openGroupModal} title="Create Group Chat">
+                  <FaUsers />
+                </Button>
+                <Button variant="link" onClick={() => setShowOnlineModal(true)} title="Show Online Users">
+                  <FaWifi />
+                </Button>
+              </div>
             </div>
 
             {isChatListOpen && (
@@ -173,11 +178,11 @@ export default function Sidebar({
                 className="chat-scroll"
                 style={{
                   overflowY: "auto",
-                  maxHeight: "77vh",
+                  maxHeight: "71.7vh",
                   backgroundColor: "var(--background)",
                   border: "2px solid var(--secondary)",
                   borderRadius: "0 0 4px 4px",
-                  color: "var(--text)",                                             
+                  color: "var(--text)",
                 }}
               >
                 {loading ? (
@@ -342,6 +347,42 @@ export default function Sidebar({
             {creating ? "Creating..." : "Create Group"}
           </Button>
         </Modal.Footer>
+      </Modal>
+
+      {/* Online Users Modal */}
+      <Modal show={showOnlineModal} onHide={() => setShowOnlineModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Online Users</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {onlineUsers.length <= 1 ? (
+            <div className="text-center text-muted">No other users are online.</div>
+          ) : (
+            onlineUsers
+              .filter((id) => id !== user._id)
+              .map((id) => {
+                const u = chats
+                  .flatMap((chat) => chat.users)
+                  .find((usr) => usr._id === id);
+                return (
+                  u && (
+                    <div key={u._id} className="d-flex align-items-center gap-3 mb-2">
+                      <Image
+                        src={`${BASE_URL}${u.avatar || "/default-avatar.png"}`}
+                        roundedCircle
+                        width={40}
+                        height={40}
+                      />
+                      <div>
+                        <div>{u.firstName} {u.lastName}</div>
+                        <div style={{ fontSize: "0.85rem", color: "gray" }}>{u.email}</div>
+                      </div>
+                    </div>
+                  )
+                );
+              })
+          )}
+        </Modal.Body>
       </Modal>
     </>
   );

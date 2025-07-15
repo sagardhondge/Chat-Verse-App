@@ -1,4 +1,3 @@
-// src/context/SocketContext.jsx
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
 import { useAuth } from "./AuthContext";
@@ -6,7 +5,7 @@ import { useAuth } from "./AuthContext";
 const SocketContext = createContext(null);
 
 export const SocketProvider = ({ children }) => {
-  const { user } = useAuth();
+  const { user, setOnlineUsers } = useAuth();
   const socketRef = useRef(null);
   const [socket, setSocket] = useState(null);
 
@@ -28,16 +27,18 @@ export const SocketProvider = ({ children }) => {
       return;
     }
 
+    const baseSocketUrl = import.meta.env.VITE_API_URL?.replace(/\/api$/, "");
+
     console.log("🪪 Connecting socket with token:", token);
 
-    const newSocket = io(import.meta.env.VITE_API_URL, {
+    const newSocket = io(baseSocketUrl, {
       auth: { token },
       withCredentials: true,
       transports: ["websocket"],
     });
 
     newSocket.on("connect", () => {
-      console.log(" Socket connected successfully");
+      console.log("✅ Socket connected successfully");
     });
 
     newSocket.on("disconnect", (reason) => {
@@ -45,14 +46,19 @@ export const SocketProvider = ({ children }) => {
     });
 
     newSocket.on("connect_error", (err) => {
-      console.error(" Socket connection error:", err.message);
+      console.error("❌ Socket connection error:", err.message);
+    });
+
+    newSocket.on("onlineUsers", (users) => {
+      setOnlineUsers(users);
+      console.log("👥 Online users updated:", users);
     });
 
     socketRef.current = newSocket;
     setSocket(newSocket);
 
     return () => {
-      console.log(" Cleaning up socket...");
+      console.log("🧹 Cleaning up socket...");
       newSocket.disconnect();
       socketRef.current = null;
       setSocket(null);
