@@ -110,7 +110,7 @@ export default function MessageInput({
         onKeyDown={handleKeyDown}
         style={{
           resize: "none",
-          backgroundColor: theme.input,
+          backgroundColor:"white",
           color: theme.text,
           borderColor: theme.border,
         }}

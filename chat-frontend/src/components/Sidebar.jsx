@@ -121,7 +121,7 @@ export default function Sidebar({
         <div
           className="d-flex flex-column justify-content-between"
           style={{
-            width: "450px",
+            width: "550px",
             height: "100vh",
             fontFamily: "Segoe UI, sans-serif",
             backgroundColor: "var(--background)",
@@ -181,6 +181,7 @@ export default function Sidebar({
                   maxHeight: "71.7vh",
                   backgroundColor: "var(--background)",
                   border: "2px solid var(--secondary)",
+                  borderBottom: "2px solid var(--secondary)",
                   borderRadius: "0 0 4px 4px",
                   color: "var(--text)",
                 }}
