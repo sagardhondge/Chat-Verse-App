@@ -5,8 +5,8 @@ import { useAuth } from "../context/AuthContext";
 import { Card, Spinner, Image } from "react-bootstrap";
 
 export default function ProfilePage() {
-  const { id } = useParams(); // from route /profile/:id
-  const { user } = useAuth(); // current logged-in user
+  const { id } = useParams(); 
+  const { user } = useAuth(); 
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
