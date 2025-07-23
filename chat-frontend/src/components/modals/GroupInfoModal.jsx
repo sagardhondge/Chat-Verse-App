@@ -1,12 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Modal,
   Button,
   ListGroup,
-  Image,
   Form,
   InputGroup,
   Spinner,
+  Image,
 } from "react-bootstrap";
 import { useAuth } from "../../context/AuthContext";
 import { useTheme } from "../../context/ThemeContext";
@@ -27,8 +27,22 @@ export default function GroupInfoModal({
   const [search, setSearch] = useState("");
   const [searching, setSearching] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
-  const [confirmAction, setConfirmAction] = useState(null); // "leave" or "delete"
-  const [targetUser, setTargetUser] = useState(null);
+  const [confirmAction, setConfirmAction] = useState(null);
+  const [groupImage, setGroupImage] = useState(null);
+  const [updatingImage, setUpdatingImage] = useState(false);
+
+  useEffect(() => {
+    if (theme) {
+      const root = document.documentElement;
+      root.style.setProperty("--theme-surface", theme.surface);
+      root.style.setProperty("--theme-text", theme.text);
+      root.style.setProperty("--theme-border", theme.border);
+      root.style.setProperty("--theme-shadow", theme.shadow);
+      root.style.setProperty("--theme-input", theme.input || "#f5f5f5");
+      root.style.setProperty("--theme-background", theme.background || "#ffffff");
+      root.style.setProperty("--theme-card", theme.card || theme.surface);
+    }
+  }, [theme]);
 
   if (!chat) return null;
 
@@ -49,10 +63,7 @@ export default function GroupInfoModal({
 
   const handleAddUser = async (userId) => {
     try {
-      const { data } = await api.put("/chat/group/add", {
-        chatId: chat._id,
-        userId,
-      });
+      const { data } = await api.put(`/group/${chat._id}/add`, { userId });
       onUpdate(data);
       setSearch("");
       setSearchResults([]);
@@ -63,10 +74,7 @@ export default function GroupInfoModal({
 
   const handleKick = async (userId) => {
     try {
-      const { data } = await api.put("/chat/group/remove", {
-        chatId: chat._id,
-        userId,
-      });
+      const { data } = await api.put(`/group/${chat._id}/remove`, { userId });
       onUpdate(data);
     } catch {
       alert("Failed to remove user.");
@@ -75,23 +83,15 @@ export default function GroupInfoModal({
 
   const handlePromote = async (userId) => {
     try {
-      const { data } = await api.put("/chat/group/promote", {
-        chatId: chat._id,
-        userId,
-      });
+      const { data } = await api.put(`/group/${chat._id}/promote`, { userId });
       onUpdate(data);
     } catch {
       alert("Failed to promote user.");
     }
   };
 
-  const confirmAndLeave = () => {
-    setConfirmAction("leave");
-  };
-
-  const confirmAndDelete = () => {
-    setConfirmAction("delete");
-  };
+  const confirmAndLeave = () => setConfirmAction("leave");
+  const confirmAndDelete = () => setConfirmAction("delete");
 
   const executeConfirmAction = () => {
     if (confirmAction === "leave") onLeave(chat._id, false);
@@ -99,15 +99,44 @@ export default function GroupInfoModal({
     setConfirmAction(null);
   };
 
+  const handleImageUpload = async () => {
+    if (!groupImage) return;
+    const formData = new FormData();
+    formData.append("groupImage", groupImage);
+
+    try {
+      setUpdatingImage(true);
+      const { data } = await api.put(`/group/${chat._id}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      onUpdate(data);
+      setGroupImage(null);
+    } catch {
+      alert("Failed to update group image.");
+    } finally {
+      setUpdatingImage(false);
+    }
+  };
+
+  const resolveImageSrc = () => {
+    if (groupImage) return URL.createObjectURL(groupImage);
+    if (chat.groupImage) {
+      return chat.groupImage.startsWith("http")
+        ? chat.groupImage
+        : `${import.meta.env.VITE_API_URL}${chat.groupImage}`;
+    }
+    return "/default-group.png";
+  };
+
   const modalStyle = {
-    backgroundColor: theme.surface,
-    color: theme.text,
+    backgroundColor: "var(--theme-surface)",
+    color: "var(--theme-text)",
   };
 
   const inputStyle = {
-    backgroundColor: theme.input,
-    color: theme.text,
-    borderColor: theme.border,
+    backgroundColor: "var(--theme-input)",
+    color: "var(--theme-text)",
+    borderColor: "var(--theme-border)",
   };
 
   return (
@@ -118,6 +147,45 @@ export default function GroupInfoModal({
         </Modal.Header>
 
         <Modal.Body style={modalStyle}>
+          <div className="text-center mb-3">
+            <Image
+              src={resolveImageSrc()}
+              alt="Group Avatar"
+              roundedCircle
+              width={120}
+              height={120}
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = "/default-group.png";
+              }}
+              style={{
+                objectFit: "cover",
+                border: `2px solid var(--theme-border)`,
+                backgroundColor: "var(--theme-surface)",
+              }}
+            />
+          </div>
+
+          {isAdmin && (
+            <Form.Group className="mb-3 text-center">
+              <Form.Control
+                type="file"
+                accept="image/*"
+                onChange={(e) => setGroupImage(e.target.files[0])}
+                style={{ ...inputStyle, maxWidth: 300, margin: "0 auto" }}
+              />
+              <Button
+                className="mt-2"
+                variant="outline-success"
+                size="sm"
+                disabled={!groupImage || updatingImage}
+                onClick={handleImageUpload}
+              >
+                {updatingImage ? <Spinner animation="border" size="sm" /> : "Upload Photo"}
+              </Button>
+            </Form.Group>
+          )}
+
           <p><strong>Group Name:</strong> {chat.chatName}</p>
           <p><strong>Admin:</strong> {chat.groupAdmin?.firstName} {chat.groupAdmin?.lastName}</p>
 
@@ -128,7 +196,7 @@ export default function GroupInfoModal({
               <ListGroup.Item
                 key={u._id}
                 className="d-flex justify-content-between align-items-center"
-                style={{ backgroundColor: theme.background, color: theme.text }}
+                style={{ backgroundColor: "var(--theme-background)", color: "var(--theme-text)" }}
               >
                 <div>
                   {u.firstName} {u.lastName}
@@ -181,29 +249,28 @@ export default function GroupInfoModal({
               variant="light"
               className="w-100 mb-2 text-start"
               onClick={() => handleAddUser(u._id)}
-              style={{ backgroundColor: theme.card, color: theme.text }}
+              style={{ backgroundColor: "var(--theme-card)", color: "var(--theme-text)" }}
             >
               {u.firstName} {u.lastName}
             </Button>
           ))}
         </Modal.Body>
 
-<Modal.Footer style={modalStyle}>
-  {isAdmin && (
-    <Button variant="danger" onClick={confirmAndDelete}>
-      Delete Group
-    </Button>
-  )}
-  <Button variant="outline-danger" onClick={confirmAndLeave}>
-    Leave Group
-  </Button>
-  <Button variant="secondary" onClick={onHide}>
-    Close
-  </Button>
-</Modal.Footer>
+        <Modal.Footer style={modalStyle}>
+          {isAdmin && (
+            <Button variant="danger" onClick={confirmAndDelete}>
+              Delete Group
+            </Button>
+          )}
+          <Button variant="outline-danger" onClick={confirmAndLeave}>
+            Leave Group
+          </Button>
+          <Button variant="secondary" onClick={onHide}>
+            Close
+          </Button>
+        </Modal.Footer>
       </Modal>
 
-      {/* Confirm Modal */}
       <Modal show={!!confirmAction} onHide={() => setConfirmAction(null)} centered>
         <Modal.Header closeButton style={modalStyle}>
           <Modal.Title>Are you sure?</Modal.Title>

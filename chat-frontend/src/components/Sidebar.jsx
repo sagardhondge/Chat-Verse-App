@@ -42,6 +42,8 @@ export default function Sidebar({
   const [searchLoading, setSearchLoading] = useState(false);
   const [creating, setCreating] = useState(false);
   const [showOnlineModal, setShowOnlineModal] = useState(false);
+  const [groupAvatar, setGroupAvatar] = useState(null);
+  const [groupAvatarPreview, setGroupAvatarPreview] = useState("");
 
   const handleLogout = () => {
     logout();
@@ -61,6 +63,8 @@ export default function Sidebar({
     setSearchTerm("");
     setSearchResults([]);
     setSelectedMembers([]);
+    setGroupAvatar(null);
+    setGroupAvatarPreview("");
     setShowGroupModal(true);
   };
 
@@ -92,13 +96,18 @@ export default function Sidebar({
     }
     setCreating(true);
     try {
-      const res = await api.post("/chat/group", {
-        chatName: groupName,
-        users: selectedMembers.map((m) => m._id),
+      const formData = new FormData();
+      formData.append("chatName", groupName);
+      formData.append("users", JSON.stringify(selectedMembers.map((m) => m._id)));
+      if (groupAvatar) formData.append("avatar", groupAvatar);
+
+      const res = await api.post("/chat/group", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
+
       setSelectedChat(res.data);
       setShowGroupModal(false);
-    } catch {
+    } catch (error) {
       alert("Create group failed");
     } finally {
       setCreating(false);
@@ -300,6 +309,28 @@ export default function Sidebar({
           <Modal.Title>Create Group Chat</Modal.Title>
         </Modal.Header>
         <Modal.Body>
+          <Form.Group className="mb-3 text-center">
+            <Form.Label>Group Avatar</Form.Label>
+            <div className="mb-2">
+              <Image
+                src={groupAvatarPreview || "/default-avatar.png"}
+                roundedCircle
+                width={100}
+                height={100}
+                style={{ objectFit: "cover", border: "2px solid var(--secondary)" }}
+              />
+            </div>
+            <Form.Control
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files[0];
+                setGroupAvatar(file);
+                setGroupAvatarPreview(URL.createObjectURL(file));
+              }}
+            />
+          </Form.Group>
+
           <Form.Group className="mb-3">
             <Form.Label>Group Name</Form.Label>
             <Form.Control
@@ -308,6 +339,7 @@ export default function Sidebar({
               placeholder="Enter group name"
             />
           </Form.Group>
+
           <Form onSubmit={searchUsers} className="mb-3">
             <InputGroup>
               <Form.Control

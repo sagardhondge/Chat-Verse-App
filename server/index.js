@@ -8,7 +8,7 @@ const path = require("path");
 
 const connection = require("./db/db");
 const initSocket = require("./socketServer");
-
+const groupRoute = require("./routes/groupRoute");
 const userRoutes = require("./routes/userRoute");
 const avatarRoute = require("./routes/avatarRoute");
 const chatRoute = require("./routes/chatRoute");
@@ -72,6 +72,8 @@ app.use("/api/avatar", avatarRoute);
 app.use("/api/chat", chatRoute);
 app.use("/api/message", messageRoute);
 app.use("/api/upload", uploadRoute);
+app.use("/api/group", groupRoute);
+
 
 // ✅ Catch-all route for 404
 app.use((req, res) => {
