@@ -19,7 +19,7 @@ const app = express();
 const server = http.createServer(app);
 
 const allowedOrigins = [
-  "https://chatverse-app-eight.vercel.app",
+  "https://chat-verse-app-orpin.vercel.app",
   "http://localhost:5173",
 ];
 
