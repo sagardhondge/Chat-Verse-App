@@ -93,8 +93,7 @@ cd chatverse
 
 2. Setup Backend
 bash
-Copy
-Edit
+
 cd backend
 npm install
 touch .env
