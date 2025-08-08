@@ -5,7 +5,7 @@ ChatVerse is a full-featured real-time messaging app built with the **MERN stack
 ---
 
 ## 🚀 Live Demo
-
+🔗 **Frontend**: https://chat-verse-app-orpin.vercel.app/
 🔗 **Frontend**: [https://chat-verse-app-orpin.vercel.app](https://chat-verse-app-orpin.vercel.app)  
 🔗 **Backend**: [https://chatverse-backend-0c8u.onrender.com](https://chatverse-backend-0c8u.onrender.com)
 
@@ -13,9 +13,14 @@ ChatVerse is a full-featured real-time messaging app built with the **MERN stack
 
 ## 🖥️ Screenshots
 
-| Chat View | Sidebar & Theme |
-|-----------|-----------------|
-| ![Chat UI](screenshots/chat-ui.png) | ![Sidebar](screenshots/sidebar-ui.png) |
+## 🏠 Home Page
+
+![Home Page](./assets/home.png)
+
+## 🎨 Theme Page
+
+![Theme Page](./assets/themepage.png)
+
 
 ---
 
@@ -79,7 +84,7 @@ chatverse/
 ```bash
 
 
-git clone [https://github.com/your-username/chatverse.git]
+git clone :https://github.com/sagardhondge/Chat-Verse-App.git
 (https://github.com/sagardhondge/Chat-Verse-App)
 cd chatverse
 
@@ -95,9 +100,6 @@ npm install
 touch .env
 .env example
 
-ini
-Copy
-Edit
 PORT=4000
 MONGO_URI=your_mongodb_connection
 JWT_SECRET=your_jwt_secret
@@ -105,25 +107,21 @@ CLOUDINARY_CLOUD_NAME=your_cloudinary_name
 CLOUDINARY_API_KEY=your_key
 CLOUDINARY_API_SECRET=your_secret
 bash
-Copy
-Edit
-npm start
+
+npm run dev
+
 3. Setup Frontend
 bash
-Copy
-Edit
+
 cd frontend
 npm install
 touch .env
 .env example
 
-ini
-Copy
-Edit
+
 VITE_API_URL=https://chatverse-backend-0c8u.onrender.com
 bash
-Copy
-Edit
+
 npm run dev
 🔒 Environment Variables
 Variable	Description
@@ -135,26 +133,9 @@ VITE_API_URL	Backend URL used by frontend
 👨‍💻 Contributing
 Pull requests are welcome! If you'd like to contribute, fork the repo and submit a PR.
 
-📝 License
-This project is licensed under the MIT License.
-See the LICENSE file for details.
-
 📬 Contact
-📧 Email: [your-email@example.com]
-🔗 LinkedIn: https://linkedin.com/in/yourprofile
-
-Built with ❤️ by [Your Name]
-
-yaml
-Copy
-Edit
-
----
-
-Let me know:
-- Your GitHub repo link → I’ll update it
-- Your LinkedIn or contact email → I’ll plug them in
-- If you want badges (e.g., Vercel, MongoDB, etc.) at the top too
+📧 Email: sagardhondge@gmail.com
+🔗 LinkedIn: www.linkedin.com/in/sagar-dhondge-764258332
 
 
-
+Built  by Sagar Dhondge
