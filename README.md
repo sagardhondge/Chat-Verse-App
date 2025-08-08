@@ -19,7 +19,7 @@ ChatVerse is a full-featured real-time messaging app built with the **MERN stack
 
 ## 🎨 Theme Page
 
-![Theme Page](./assets/themepage.png)
+![Theme Page](./assets/theme.png)
 
 
 ---
