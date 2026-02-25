@@ -5,7 +5,6 @@ ChatVerse is a full-featured real-time messaging app built with the **MERN stack
 ---
 
 ## 🚀 Live Demo
-🔗 **Frontend**: https://chat-verse-app-orpin.vercel.app/
 🔗 **Frontend**: [https://chat-verse-app-orpin.vercel.app](https://chat-verse-app-orpin.vercel.app)  
 🔗 **Backend**: [https://chat-verse-app.onrender.com](https://chat-verse-app.onrender.com)
 
