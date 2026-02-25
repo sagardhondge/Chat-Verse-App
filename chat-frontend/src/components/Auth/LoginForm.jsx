@@ -9,7 +9,7 @@ export default function LoginForm() {
   const { setUser } = useAuth();
   const { darkMode } = useTheme();
   const navigate = useNavigate();
-
+  const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -61,17 +61,33 @@ export default function LoginForm() {
 
         <Form.Group className="mb-4">
           <Form.Label>Password</Form.Label>
-          <Form.Control
-            type="password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Enter your password"
-            className={`rounded px-3 py-2 ${
-              darkMode ? "bg-dark text-white border-secondary" : ""
-            }`}
-          />
-        </Form.Group>
+            <div className="position-relative">
+              <Form.Control
+                type={showPassword ? "text" : "password"}
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter your password"
+                className={`rounded px-3 py-2 pe-5 ${
+                darkMode ? "bg-dark text-white border-secondary" : ""
+              }`}
+              />
+
+        <span
+          onClick={() => setShowPassword(!showPassword)}
+          style={{
+          position: "absolute",
+          right: "15px",
+          top: "50%",
+          transform: "translateY(-50%)",
+          cursor: "pointer",
+          fontSize: "18px",
+          }}
+        >
+        {showPassword ? "*" : "👁"}
+        </span>
+      </div>
+      </Form.Group>
 
         <Button
           type="submit"
